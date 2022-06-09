@@ -50,6 +50,11 @@ class Trigger(Cog):
                 embed.add_field(name="Triggers", value=filter_text)
             embed.colour = discord.Color.dark_orange()
             await ctx.send(embed=embed)
+    trigger_group.example_usage = """
+    `{prefix}trigger` - Lists all the triggers in the current server
+    `{prefix}trigger add hello hi! how are you?` - adds the response "hi! how are you?" for the trigger "hello"
+    `{prefix}trigger remove 12` - removes the trigger with an id of 12
+    """
 
     trigger_group.example_usage = """
     `{prefix}trigger` - Lists all the triggers in the current server
