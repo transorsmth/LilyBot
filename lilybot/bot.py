@@ -38,7 +38,7 @@ class InvalidContext(commands.CheckFailure):
 
 class LilyBot(commands.Bot):
     """Botty things that are critical to LilyBot working"""
-    _global_cooldown = commands.Cooldown(1, 1)  # One command per second per user
+    _global_cooldown = commands.Cooldown(1, 1, commands.BucketType.user)  # One command per second per user
 
     def __init__(self, config: dict, *args, **kwargs):
         self.dynamic_prefix = _utils.PrefixHandler(config['prefix'])
