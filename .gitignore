@@ -1,0 +1,23 @@
+# runtime files
+__pycache__
+*.pyc
+config.json
+dozer.db
+cilog.txt
+
+venv/
+.venv/
+
+# IDEA
+.idea/
+
+# for vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+*~
+
+#VSCode
+settings.json
+/.mypy_cache/
