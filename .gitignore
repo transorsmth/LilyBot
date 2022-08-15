@@ -21,3 +21,4 @@ venv/
 #VSCode
 settings.json
 /.mypy_cache/
+*.pickle
