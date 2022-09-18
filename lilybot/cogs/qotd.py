@@ -1,9 +1,10 @@
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
 
 import discord
+from discord.ext.commands import guild_only, has_permissions
 from discord.ext.tasks import loop
-from discord.ext.commands import guild_only, has_permissions, UserInputError
+
 from ._utils import *
 from .. import db
 
@@ -234,6 +235,6 @@ class QOTDChannel(db.DatabaseTable):
         return result_list
 
 
-def setup(bot):
+async def setup(bot):
     """Add the levels cog to a bot."""
-    bot.add_cog(QOTD(bot))
+    await bot.add_cog(QOTD(bot))

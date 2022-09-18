@@ -2,13 +2,13 @@
 import datetime
 import logging
 import traceback
-from xml.etree import ElementTree
 from asyncio import CancelledError, InvalidStateError
+from xml.etree import ElementTree
+
 import aiohttp
 import discord
 from discord.ext import tasks
 from discord.ext.commands import guild_only, has_permissions, BadArgument
-
 
 from lilybot.context import LilyBotContext
 from ._utils import *
@@ -429,10 +429,10 @@ class News(Cog):
     get_exception.example_usage = "`{prefix}news get_exception` - Get the exception that the loop failed with"
 
 
-def setup(bot):
+async def setup(bot):
     """Setup cog"""
 
-    bot.add_cog(News(bot))
+    await bot.add_cog(News(bot))
 
 
 class NewsSubscription(db.DatabaseTable):
@@ -445,7 +445,7 @@ class NewsSubscription(db.DatabaseTable):
         """Create the table in the database"""
         async with db.Pool.acquire() as conn:
             await conn.execute(f"""
-            CREATE TABLE IF NOT EXISTS {cls.__tablename__} (
+            CREATE TABLE {cls.__tablename__} (
             id serial PRIMARY KEY NOT NULL,
             channel_id bigint NOT NULL,
             guild_id bigint NOT NULL,

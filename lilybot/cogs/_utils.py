@@ -1,12 +1,16 @@
-"""Utilities for LilyBot."""
+"""Utilities for Dozer."""
 import asyncio
 import inspect
 import logging
 import typing
 from collections.abc import Mapping
-from typing import Dict
+from typing import Dict, Union
+
 import discord
+from discord import app_commands
 from discord.ext import commands
+from discord.ext.commands import HybridCommand
+from discord.ext.commands.core import MISSING
 
 from lilybot import db
 from lilybot.context import LilyBotContext
@@ -14,7 +18,7 @@ from lilybot.context import LilyBotContext
 __all__ = ['bot_has_permissions', 'command', 'group', 'Cog', 'Reactor', 'Paginator', 'paginate', 'chunk', 'dev_check',
            'DynamicPrefixEntry']
 
-Lily_LOGGER = logging.getLogger(__name__)
+DOZER_LOGGER = logging.getLogger("dozer")
 
 
 class CommandMixin:
@@ -50,22 +54,8 @@ class CommandMixin:
         self._example_usage = self.__original_kwargs__['example_usage'] = inspect.cleandoc(usage)
 
 
-class Command(CommandMixin, commands.Command):
+class Command(CommandMixin, HybridCommand):
     """Represents a command"""
-
-
-class Group(CommandMixin, commands.Group):
-    """Class for command groups"""
-
-    def command(self, *args, **kwargs):
-        """Initiates a command"""
-        kwargs.setdefault('cls', Command)
-        return super(Group, self).command(*args, **kwargs)
-
-    def group(self, *args, **kwargs):
-        """Initiates a command group"""
-        kwargs.setdefault('cls', Group)
-        return super(Group, self).command(*args, **kwargs)
 
 
 def command(**kwargs):
@@ -78,6 +68,44 @@ def group(**kwargs):
     """Links command groups"""
     kwargs.setdefault('cls', Group)
     return commands.group(**kwargs)
+
+
+class Group(CommandMixin, commands.HybridGroup):
+    """Class for command groups"""
+
+    def command(
+            self,
+            name: Union[str, app_commands.locale_str] = MISSING,
+            *args: typing.Any,
+            with_app_command: bool = True,
+            **kwargs: typing.Any,
+    ):
+        """Initiates a command"""
+
+        def decorator(func):
+            kwargs.setdefault('parent', self)
+            result = command(name=name, *args, with_app_command=with_app_command, **kwargs)(func)
+            self.add_command(result)
+            return result
+
+        return decorator
+
+    def group(
+            self,
+            name: Union[str, app_commands.locale_str] = MISSING,
+            *args: typing.Any,
+            with_app_command: bool = True,
+            **kwargs: typing.Any,
+    ):
+        """Initiates a command group"""
+
+        def decorator(func):
+            kwargs.setdefault('parent', self)
+            result = group(name=name, *args, with_app_command=with_app_command, **kwargs)(func)
+            self.add_command(result)
+            return result
+
+        return decorator
 
 
 class Cog(commands.Cog):
@@ -127,7 +155,7 @@ class Reactor:
         auto_remove: if True, reactions are removed once processed
         timeout: time, in seconds, to wait before stopping automatically. Set to None to wait forever.
         """
-        self.dest = ctx.channel
+        self.dest = ctx.interaction.followup if ctx.interaction else ctx.channel
         self.bot = ctx.bot
         self.caller = ctx.author
         self.me = ctx.guild.get_member(self.bot.user.id)
@@ -163,7 +191,7 @@ class Reactor:
             try:
                 await self.message.remove_reaction(emoji, self.me)
             except discord.errors.NotFound:
-                Lily_LOGGER.debug("Failed to remove reaction from paginator. Does the messages still exist?")
+                DOZER_LOGGER.debug("Failed to remove reaction from paginator. Does the messages still exist?")
 
     def do(self, action):
         """If there's an action reaction, do the action."""
@@ -174,7 +202,9 @@ class Reactor:
         self._action = self._stop_reaction
 
     def _check_reaction(self, reaction: discord.Reaction, member: discord.Member):
-        return reaction.message.id == self.message.id and member.id == self.caller.id
+        if self.message is not None:
+            return reaction.message.id == self.message.id and member.id == self.caller.id
+        return None
 
 
 class Paginator(Reactor):
@@ -236,7 +266,7 @@ class Paginator(Reactor):
                 else:  # Only valid option left is 4
                     self.stop()
 
-    def go_to_page(self, page: int):
+    def go_to_page(self, page: Union[int, str]):
         """Goes to a specific help page"""
         if isinstance(page, int):
             page = page % self.len_pages
@@ -265,7 +295,7 @@ async def paginate(ctx: LilyBotContext, pages, *, start: int = 0, auto_remove: b
     """
     Simple pagination based on Paginator. Pagination is handled normally and other reactions are ignored.
     """
-    paginator = Paginator(ctx, (...,), pages, start=start, auto_remove=auto_remove, timeout=timeout)
+    paginator = Paginator(ctx, [...], pages, start=start, auto_remove=auto_remove, timeout=timeout)
     async for reaction in paginator:
         pass  # The normal pagination reactions are handled - just drop anything else
 
@@ -329,7 +359,7 @@ class PrefixHandler:
         prefixes = await DynamicPrefixEntry.get_by()  # no filters, get all
         for prefix in prefixes:
             self.prefix_cache[prefix.guild_id] = prefix.prefix
-        Lily_LOGGER.info(f"{len(prefixes)} prefixes loaded from database")
+        DOZER_LOGGER.info(f"{len(prefixes)} prefixes loaded from database")
 
 
 class DynamicPrefixEntry(db.DatabaseTable):
@@ -342,7 +372,7 @@ class DynamicPrefixEntry(db.DatabaseTable):
         """Create the table in the database"""
         async with db.Pool.acquire() as conn:
             await conn.execute(f"""
-                CREATE TABLE IF NOT EXISTS {cls.__tablename__} (
+                CREATE TABLE {cls.__tablename__} (
                 guild_id bigint NOT NULL,
                 prefix text NOT NULL,
                 PRIMARY KEY (guild_id)

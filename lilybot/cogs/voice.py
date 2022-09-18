@@ -103,7 +103,7 @@ class Voice(Cog):
     @bot_has_permissions(manage_roles=True)
     @has_permissions(manage_roles=True)
     async def voicebind(self, ctx: LilyBotContext, voice_channel: discord.VoiceChannel, *, role: discord.Role):
-        """Associates a voice channel with a role, so users joining a voice channel will automatically be given a specified role or roles."""
+        """Binds a voice channel with a role, so users joining voice channels will be given desired role(s)."""
 
         config = await Voicebinds.get_by(channel_id=voice_channel.id)
         if len(config) != 0:
@@ -159,7 +159,7 @@ class Voice(Cog):
 
 class Voicebinds(db.DatabaseTable):
     """DB object to keep track of voice to text channel access bindings."""
-    __tablename__ = 'lily_voicebinds'
+    __tablename__ = 'voicebinds'
 
     __uniques__ = 'id'
 
@@ -168,7 +168,7 @@ class Voicebinds(db.DatabaseTable):
         """Create the table in the database"""
         async with db.Pool.acquire() as conn:
             await conn.execute(f"""
-            CREATE TABLE IF NOT EXISTS {cls.__tablename__} (
+            CREATE TABLE {cls.__tablename__} (
             id SERIAL PRIMARY KEY NOT NULL,
             guild_id bigint NOT NULL,
             channel_id bigint null,
@@ -198,7 +198,7 @@ class Voicebinds(db.DatabaseTable):
 
 class AutoPTT(db.DatabaseTable):
     """DB object to keep track of voice to text channel access bindings."""
-    __tablename__ = 'lily_autoptt'
+    __tablename__ = 'autoptt'
     __uniques__ = 'channel_id'
 
     @classmethod
@@ -206,7 +206,7 @@ class AutoPTT(db.DatabaseTable):
         """Create the table in the database"""
         async with db.Pool.acquire() as conn:
             await conn.execute(f"""
-            CREATE TABLE IF NOT EXISTS {cls.__tablename__} (
+            CREATE TABLE {cls.__tablename__} (
             channel_id bigint PRIMARY KEY NOT NULL,
             ptt_limit bigint null
             )""")
@@ -228,6 +228,6 @@ class AutoPTT(db.DatabaseTable):
         return result_list
 
 
-def setup(bot):
+async def setup(bot):
     """Add this cog to the main bot."""
-    bot.add_cog(Voice(bot))
+    await bot.add_cog(Voice(bot))

@@ -13,8 +13,8 @@ from sentry_sdk import capture_exception
 
 from ._utils import *
 from .. import db
-from ..components.ChatbotCustom import ChatbotCustom
 from ..components.ChatbotChannel import ChatbotChannel, ChatbotChannelCache
+from ..components.ChatbotCustom import ChatbotCustom
 from ..components.ChatbotTraining import ChatbotTraining
 from ..components.ChatbotUser import ChatbotUserCache, ChatbotUser
 from ..utils import clean
@@ -823,6 +823,6 @@ class Chat(Cog):
                 f"Failed to sync channels cache to db, Reason:{e}")
 
 
-def setup(bot):
+async def setup(bot):
     """Add the levels cog to a bot."""
-    bot.add_cog(Chat(bot))
+    await bot.add_cog(Chat(bot))

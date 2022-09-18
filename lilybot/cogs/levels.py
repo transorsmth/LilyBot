@@ -1,21 +1,19 @@
 """Records members' XP and level."""
 
+import asyncio
 import functools
-
-
 import itertools
 import logging
 import math
 import random
 import typing
 from datetime import timedelta, timezone, datetime
-import asyncio
+
 import aiohttp
 import discord
-from discord.utils import escape_markdown
 from discord.ext.commands import guild_only, has_permissions, BadArgument
 from discord.ext.tasks import loop
-from discord_slash import cog_ext, SlashContext
+from discord.utils import escape_markdown
 
 from lilybot.bot import LilyBot
 from lilybot.context import LilyBotContext
@@ -636,11 +634,6 @@ class Levels(Cog):
                                                                                 f"Notification channel: {lvl_up_msgs}")
             await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(name="rank", description="Returns your LilyBot rank")
-    async def slash_rank(self, ctx: SlashContext, member: discord.Member = None):
-        """Ranks slash handler"""
-        await self.rank(ctx, member=member)
-
     @command(aliases=["rnak", "level"])
     @guild_only()
     @discord.ext.commands.cooldown(rate=1, per=5, type=discord.ext.commands.BucketType.user)
@@ -894,6 +887,6 @@ class GuildXPSettings(db.DatabaseTable):
     __versions__ = [version_1]
 
 
-def setup(bot):
+async def setup(bot):
     """Add the levels cog to a bot."""
-    bot.add_cog(Levels(bot))
+    await bot.add_cog(Levels(bot))

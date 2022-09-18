@@ -140,6 +140,6 @@ class TriggerResponseRecords(db.DatabaseTable):
     __versions__ = [version_1]
 
 
-def setup(bot):
+async def setup(bot):
     """Add the levels cog to a bot."""
-    bot.add_cog(Trigger(bot))
+    await bot.add_cog(Trigger(bot))

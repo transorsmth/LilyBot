@@ -1,18 +1,16 @@
-# Lilybot
+# Lilybot (Code based off FRCDiscord/Dozer)
 ## Setup
 
 ### Installing PostgreSQL
 
-As of May 13, 2020 , LilyBot no longer supports database types other than PostgreSQL. This means installations using SQLite
-(as was default), will need to migrated, as well as new installations will have to have PostgreSQL installed on the
-machine for development or production. You can install PostgreSQL for your platform [here](https://www.postgresql.org/download/)
+You can install PostgreSQL for your platform [here](https://www.postgresql.org/download/)
 
 ### Getting your Discord Bot Token
 
 1. Go to the [Discord Developer Portal](https://discordapp.com/developers/applications/me) and create a new application by clicking the button. Enter a name for the application when prompted.
    ![creating a new discord app](static/newapp.png)
 
-2. Create a bot user inside of your application.
+2. Create a bot user inside your application.
    In the settings menu, go to the "Bot" menu.
    ![creating a bot user 1](static/createbot1.png)
 

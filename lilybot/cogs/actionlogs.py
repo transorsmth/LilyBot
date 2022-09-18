@@ -4,17 +4,18 @@ import datetime
 import logging
 import math
 import time
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions, BadArgument
 from discord.utils import escape_markdown
 
 from lilybot.context import LilyBotContext
-from ..components.CustomJoinLeaveMessages import CustomJoinLeaveMessages, format_join_leave, send_log
-from .moderation import GuildNewMember
 from ._utils import *
 from .general import blurple
+from .moderation import GuildNewMember
 from .. import db
+from ..components.CustomJoinLeaveMessages import CustomJoinLeaveMessages, format_join_leave, send_log
 
 Lily_LOGGER = logging.getLogger(__name__)
 
@@ -637,6 +638,6 @@ class GuildMessageLog(db.DatabaseTable):
         return result_list
 
 
-def setup(bot):
+async def setup(bot):
     """Adds the actionlog cog to the bot."""
-    bot.add_cog(Actionlog(bot))
+    await bot.add_cog(Actionlog(bot))

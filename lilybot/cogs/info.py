@@ -4,11 +4,11 @@ import math
 import typing
 from datetime import timezone, datetime
 from difflib import SequenceMatcher
+
 import discord
 import humanize
 from discord.ext.commands import cooldown, BucketType, guild_only
 from discord.utils import escape_markdown
-from discord_slash import cog_ext, SlashContext
 
 from lilybot.context import LilyBotContext
 from ._utils import *
@@ -24,14 +24,6 @@ Lily_LOGGER = logging.getLogger(__name__)
 
 class Info(Cog):
     """Commands for getting information about people and things on Discord."""
-
-    @cog_ext.cog_slash(name="user", description="Returns user information")
-    async def slash_member(self, ctx: SlashContext, member: discord.Member = None):
-        """Users slash handler"""
-        if member is None:
-            member = ctx.guild.get_member(ctx.author.id)
-        await self.member(ctx, member=member)
-
     @command(aliases=['user', 'memberinfo', 'userinfo'])
     @guild_only()
     @bot_has_permissions(embed_links=True)
@@ -140,12 +132,6 @@ class Info(Cog):
             return f'{values[0]} and {values[1]}'
         else:
             return f'{", ".join(values[:-1])}, and {values[-1]}'
-
-    @cog_ext.cog_subcommand(base="role", name="roleinfo", description="Returns role information")
-    async def slash_role(self, ctx: SlashContext, role: discord.Role):
-        """Role slash handler"""
-        await self.role(ctx, role=role)
-
     @command()
     @guild_only()
     @cooldown(1, 10, BucketType.channel)
@@ -159,11 +145,6 @@ class Info(Cog):
         embed.add_field(name="Assigned members", value=f"{len(role.members)}", inline=False)
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_subcommand(base="role", name="rolemembers", description="Returns all member who have a role")
-    async def slash_rolemember(self, ctx: SlashContext, role: discord.Role):
-        """rolemembers slash handler"""
-        await self.rolemembers(ctx, role=role)
-
     @command()
     @guild_only()
     async def rolemembers(self, ctx: LilyBotContext, role: discord.Role):
@@ -176,10 +157,6 @@ class Info(Cog):
             embeds.append(embed)
         await paginate(ctx, embeds)
 
-    @cog_ext.cog_slash(name="guild", description="Returns guild information")
-    async def slash_guild(self, ctx: SlashContext):
-        """Guild slash handler"""
-        await self.guild(ctx)
 
     @guild_only()
     @cooldown(1, 10, BucketType.channel)
@@ -263,6 +240,6 @@ class Info(Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+async def setup(bot):
     """Adds the info cog to the bot"""
-    bot.add_cog(Info(bot))
+    await bot.add_cog(Info(bot))

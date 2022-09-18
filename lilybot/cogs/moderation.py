@@ -1,22 +1,23 @@
 """Provides moderation commands for LilyBot."""
 import asyncio
 import datetime
-from logging import getLogger
-from typing import Union
 import logging
 import re
 import time
 import typing
+from logging import getLogger
+from typing import Union
+
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import BadArgument, has_permissions, RoleConverter, guild_only
 from discord.utils import escape_markdown
 
 from lilybot.context import LilyBotContext
-from ..components.CustomJoinLeaveMessages import send_log
 from ._utils import *
 from .general import blurple
 from .. import db
+from ..components.CustomJoinLeaveMessages import send_log
 
 __all__ = ["SafeRoleConverter", "Moderation", "NewMemPurgeConfig", "GuildNewMember"]
 
@@ -643,7 +644,7 @@ class Moderation(Cog):
                                    type=discord.ext.commands.BucketType.guild)  # 10 seconds per 2 members in the guild
     async def selfdeafen(self, ctx: LilyBotContext, *, reason: str = "No reason provided"):
 
-        """Deafen yourself for a given time period to prevent you from reading or sending messages; useful as a study tool."""
+        """Deafen yourself for a given time period to prevent you from reading or sending message."""
         async with ctx.typing():
             seconds = self.hm_to_seconds(reason)
             reason = self.hm_regex.sub("", reason) or "No reason provided"
@@ -1262,6 +1263,6 @@ class PunishmentTimerRecords(db.DatabaseTable):
         return result_list
 
 
-def setup(bot):
+async def setup(bot):
     """Adds the moderation cog to the bot."""
-    bot.add_cog(Moderation(bot))
+    await bot.add_cog(Moderation(bot))

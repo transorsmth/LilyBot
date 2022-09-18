@@ -2,6 +2,7 @@
 with whitelisted role exceptions."""
 
 import re
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import guild_only, has_permissions
@@ -303,10 +304,10 @@ class Filter(Cog):
     whitelist_remove.example_usage = "`{prefix}filter whitelist remove Admins` - Makes it so that Admins are caught by the filter again."
 
 
-def setup(bot):
+async def setup(bot):
     """Setup cog"""
 
-    bot.add_cog(Filter(bot))
+    await bot.add_cog(Filter(bot))
 
 
 """Database Tables"""

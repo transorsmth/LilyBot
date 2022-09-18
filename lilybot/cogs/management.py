@@ -6,6 +6,7 @@ import logging
 import math
 import os
 from datetime import timezone, datetime
+
 import discord
 from dateutil import parser
 from discord.ext.commands import has_permissions, BadArgument
@@ -236,6 +237,6 @@ class ScheduledMessages(db.DatabaseTable):
         return result_list
 
 
-def setup(bot):
+async def setup(bot):
     """Adds the Management cog to the bot"""
-    bot.add_cog(Management(bot))
+    await bot.add_cog(Management(bot))

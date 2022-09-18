@@ -6,7 +6,6 @@ from asyncio import sleep
 import discord
 from discord.ext.commands import cooldown, BucketType, guild_only, BadArgument, MissingPermissions
 from discord.utils import escape_markdown
-from discord_slash import cog_ext, SlashContext
 
 from lilybot.context import LilyBotContext
 from ._utils import *
@@ -207,6 +206,6 @@ class Fun(Cog):
         """
 
 
-def setup(bot):
+async def setup(bot):
     """Adds the fun cog to LilyBot"""
-    bot.add_cog(Fun(bot))
+    await bot.add_cog(Fun(bot))

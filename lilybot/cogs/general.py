@@ -1,5 +1,6 @@
 """General, basic commands that are common for Discord bots"""
 import inspect
+
 import discord
 from discord.ext.commands import BadArgument, cooldown, BucketType, Group, has_permissions, NotOwner, guild_only
 from discord.utils import escape_markdown
@@ -34,7 +35,7 @@ class General(Cog):
     @command(name='help', aliases=['about'])
     @bot_has_permissions(add_reactions=True, embed_links=True,
                          read_message_history=True)  # Message history is for internals of paginate()
-    async def base_help(self, ctx: LilyBotContext, *target):
+    async def base_help(self, ctx: LilyBotContext, target):
         """Show this message."""
         if not target:  # No commands - general help
             await self._help_all(ctx)
@@ -197,7 +198,7 @@ class General(Cog):
         await ctx.send(embed=e)
 
 
-def setup(bot):
+async def setup(bot):
     """Adds the general cog to the bot"""
     bot.remove_command('help')
-    bot.add_cog(General(bot))
+    await bot.add_cog(General(bot))

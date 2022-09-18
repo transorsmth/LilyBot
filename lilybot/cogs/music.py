@@ -35,9 +35,10 @@ import math
 import random
 import re
 import typing
+
+import async_timeout
 import discord
 import wavelink
-import async_timeout
 from discord.ext import menus, commands
 from discord.ext.commands import NoPrivateMessage, BadArgument
 
@@ -849,6 +850,6 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     """
 
 
-def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot):
     """Adds the cog to the bot"""
-    bot.add_cog(Music(bot))
+    await bot.add_cog(Music(bot))

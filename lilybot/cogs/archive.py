@@ -11,6 +11,6 @@ class Archive(Cog):
         print(len(messages))
 
 
-def setup(bot):
+async def setup(bot):
     """Add the levels cog to a bot."""
-    bot.add_cog(Archive(bot))
+    await bot.add_cog(Archive(bot))

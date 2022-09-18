@@ -1,7 +1,7 @@
 """Cog to post specific 'Hall of Fame' messages in a specific channel"""
 import asyncio
 import logging
-import typing
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import guild_only, has_permissions
@@ -14,7 +14,7 @@ from .. import db
 MAX_EMBED = 1024
 LOCK_TIME = .1
 FORCE_TRY_TIME = 1
-Lily_LOGGER = logging.getLogger(__name__)
+LilyBotLOGGER = logging.getLogger(__name__)
 VIDEO_FORMATS = ['.mp4', '.mov', 'webm']
 
 
@@ -39,7 +39,7 @@ def make_starboard_embed(msg: discord.Message, reaction_count: int):
     """Makes a starboard embed."""
     e = discord.Embed(color=msg.author.color, title=f"New Starred Message in #{msg.channel.name}",
                       description=msg.content, url=msg.jump_url)
-    e.set_author(name=escape_markdown(msg.author.display_name), icon_url=msg.author.avatar_url)
+    e.set_author(name=escape_markdown(msg.author.display_name), icon_url=msg.author.avatar)
 
     view_link = f" [[view]]({msg.jump_url})"
     e.add_field(name="Link:", value=view_link)
@@ -48,7 +48,7 @@ def make_starboard_embed(msg: discord.Message, reaction_count: int):
         e.add_field(name="Attachments:", value="\n".join([f"[{a.filename}]({a.url})" for a in msg.attachments]))
     elif len(msg.attachments) == 1:
         if msg.attachments[0].width is not None and msg.attachments[0].filename[-4:] not in VIDEO_FORMATS and not \
-        msg.attachments[0].is_spoiler():
+                msg.attachments[0].is_spoiler():
             e.set_image(url=msg.attachments[0].url)
         else:
             e.add_field(name="Attachment:", value=f"[{msg.attachments[0].filename}]({msg.attachments[0].url})")
@@ -91,7 +91,7 @@ class Starboard(Cog):
         # check if the message we're trying to HoF is a hof message
         starboard_check = await StarboardMessage.get_by(starboard_message_id=message.id)
         if len(starboard_check):
-            Lily_LOGGER.info("Attempt to star starboard message, skipping")
+            LilyBotLOGGER.info("Attempt to star starboard message, skipping")
             return
 
         db_msgs = await StarboardMessage.get_by(message_id=message.id)
@@ -106,7 +106,7 @@ class Starboard(Cog):
                 sent_msg = await self.bot.get_channel(config.channel_id).fetch_message(db_msgs[0].starboard_message_id)
             except discord.errors.NotFound:
                 # Uh oh! Starboard message was deleted. Let's try and delete it
-                Lily_LOGGER.warning(f"Cannot find Starboard Message {db_msgs[0].starboard_message_id} to update")
+                LilyBotLOGGER.warning(f"Cannot find Starboard Message {db_msgs[0].starboard_message_id} to update")
                 fake_msg = discord.Object(db_msgs[0].starboard_message_id)
                 await self.remove_from_starboard(config, fake_msg, True)
                 return
@@ -149,7 +149,7 @@ class Starboard(Cog):
         # Starboard check
         if str(reaction) == config.star_emoji and (reaction.count - self_react) >= config.threshold and \
                 member != msg.guild.me and not await is_cancelled(config.cancel_emoji, msg, msg.guild.me):
-            Lily_LOGGER.debug(f"Starboard threshold reached on message {reaction.message.id} in "
+            LilyBotLOGGER.debug(f"Starboard threshold reached on message {reaction.message.id} in "
                                f"{reaction.message.guild.name} from user {member.id}, sending to starboard")
             await self.send_to_starboard(config, msg, reaction.count)
 
@@ -157,12 +157,12 @@ class Starboard(Cog):
         elif str(reaction) == config.star_emoji and (reaction.count - self_react) < config.threshold:
             db_msgs = await StarboardMessage.get_by(message_id=msg.id)
             if len(db_msgs):
-                Lily_LOGGER.debug("Under starboard threshold, removing starboard")
+                LilyBotLOGGER.debug("Under starboard threshold, removing starboard")
                 try:
                     starboard_msg = await self.bot.get_channel(config.channel_id). \
                         fetch_message(db_msgs[0].starboard_message_id)
                 except discord.NotFound:
-                    Lily_LOGGER.warning(f"Cannot find Starboard Message {db_msgs[0].starboard_message_id} to remove")
+                    LilyBotLOGGER.warning(f"Cannot find Starboard Message {db_msgs[0].starboard_message_id} to remove")
                     starboard_msg = discord.Object(db_msgs[0].starboard_message_id)
                 await self.remove_from_starboard(config, starboard_msg)
 
@@ -170,19 +170,19 @@ class Starboard(Cog):
         elif str(reaction) == config.cancel_emoji and msg.channel.id == config.channel_id:
             db_msgs = await StarboardMessage.get_by(starboard_message_id=msg.id)
             if len(db_msgs) and member.id == db_msgs[0].author_id:
-                Lily_LOGGER.debug("Message cancelled in starboard channel, cancelling")
+                LilyBotLOGGER.debug("Message cancelled in starboard channel, cancelling")
                 await self.remove_from_starboard(config, msg, True)
 
         # check if it's been cancelled on the original message
         elif str(reaction) == config.cancel_emoji:
             db_msgs = await StarboardMessage.get_by(message_id=msg.id)
             if len(db_msgs) and member.id == db_msgs[0].author_id:
-                Lily_LOGGER.debug("Message cancelled in original channel, cancelling")
+                LilyBotLOGGER.debug("Message cancelled in original channel, cancelling")
                 try:
                     starboard_msg = await self.bot.get_channel(config.channel_id). \
                         fetch_message(db_msgs[0].starboard_message_id)
                 except discord.NotFound:
-                    Lily_LOGGER.warning(f"Cannot find Starboard Message {db_msgs[0].starboard_message_id} to remove")
+                    LilyBotLOGGER.warning(f"Cannot find Starboard Message {db_msgs[0].starboard_message_id} to remove")
                     starboard_msg = discord.Object(db_msgs[0].starboard_message_id)
                 await self.remove_from_starboard(config, starboard_msg, True)
 
@@ -215,7 +215,7 @@ class Starboard(Cog):
         if len(matching_reaction):
             await self.starboard_check(matching_reaction[0], member)
         else:
-            Lily_LOGGER.debug(f"Unable to find reaction for message({message.id})")
+            LilyBotLOGGER.debug(f"Unable to find reaction for message({message.id})")
 
     @guild_only()
     @group(invoke_without_command=True, aliases=['hof'])
@@ -243,8 +243,8 @@ class Starboard(Cog):
     @bot_has_permissions(add_reactions=True, embed_links=True)
     @starboard.command()
     async def config(self, ctx: LilyBotContext, channel: discord.TextChannel,
-                     star_emoji: typing.Union[discord.Emoji, str],
-                     threshold: int, cancel_emoji: typing.Union[discord.Emoji, str] = None):
+                     star_emoji: discord.Emoji,
+                     threshold: int, cancel_emoji: discord.Emoji = None):
         """Modify the settings for this server's starboard"""
         if str(star_emoji) == str(cancel_emoji):
             await ctx.send("The Star Emoji and Cancel Emoji cannot be the same!")
@@ -325,9 +325,9 @@ class Starboard(Cog):
     """
 
 
-def setup(bot):
+async def setup(bot):
     """Add this cog to the bot"""
-    bot.add_cog(Starboard(bot))
+    await bot.add_cog(Starboard(bot))
 
 
 class StarboardConfig(db.DatabaseTable):
@@ -340,7 +340,7 @@ class StarboardConfig(db.DatabaseTable):
         """Create the table in the database"""
         async with db.Pool.acquire() as conn:
             await conn.execute(f"""
-            CREATE TABLE IF NOT EXISTS {cls.__tablename__} (
+            CREATE TABLE {cls.__tablename__} (
             guild_id bigint PRIMARY KEY NOT NULL,
             channel_id bigint NOT NULL,
             star_emoji varchar NOT NULL,
@@ -378,7 +378,7 @@ class StarboardMessage(db.DatabaseTable):
         """Create the table in the database"""
         async with db.Pool.acquire() as conn:
             await conn.execute(f"""
-            CREATE TABLE IF NOT EXISTS {cls.__tablename__} (
+            CREATE TABLE {cls.__tablename__} (
             message_id bigint PRIMARY KEY NOT NULL,
             channel_id bigint NOT NULL,
             starboard_message_id bigint NOT NULL,
