@@ -11,6 +11,7 @@ from .. import db
 
 class QOTD(Cog):
     """Sends a daily question in a channel"""
+
     def __init__(self, bot):
         self.send_questions.start()
         super().__init__(bot)
@@ -61,7 +62,7 @@ class QOTD(Cog):
             embed.set_thumbnail(url=ctx.guild.icon_url)
             embed.description = "No questions found for this guild! Add one using `{}qotd add <question>}`".format(
                 ctx.prefix)
-            embed.color = discord.Color.red()
+            embed.colour = discord.Color.red()
             await ctx.send(embed=embed)
             return
         else:
@@ -74,7 +75,7 @@ class QOTD(Cog):
                 embed.description = filter_text
             else:
                 embed.add_field(name="Questions", value=filter_text)
-            embed.color = discord.Color.dark_orange()
+            embed.colour = discord.Color.dark_orange()
             await ctx.send(embed=embed)
 
     @qotd_group.command(name="channels", aliases=["config"])
@@ -87,7 +88,7 @@ class QOTD(Cog):
             embed.set_thumbnail(url=ctx.guild.icon_url)
             embed.description = "No Channels found for this guild! Add one using `{}qotd channeladd #channel`".format(
                 ctx.prefix)
-            embed.color = discord.Color.red()
+            embed.colour = discord.Color.red()
             await ctx.send(embed=embed)
             return
         else:
@@ -100,7 +101,7 @@ class QOTD(Cog):
                 embed.description = filter_text
             else:
                 embed.add_field(name="Channels", value=filter_text)
-            embed.color = discord.Color.dark_orange()
+            embed.colour = discord.Color.dark_orange()
             await ctx.send(embed=embed)
 
     @qotd_group.command(name="disable", aliases=["off", "stop"])
@@ -141,7 +142,7 @@ class QOTD(Cog):
             embed = discord.Embed(title="Question too long")
             embed.set_thumbnail(url=ctx.guild.icon_url)
             embed.description = "The question must be less than 128 characters"
-            embed.color = discord.Color.red()
+            embed.colour = discord.Color.red()
             await ctx.send(embed=embed)
             return
         else:
@@ -150,7 +151,7 @@ class QOTD(Cog):
             embed.set_thumbnail(url=ctx.guild.icon_url)
             embed.description = "The question has been added"
             embed.add_field(name="Question:", value=question)
-            embed.color = discord.Color.green()
+            embed.colour = discord.Color.green()
             await ctx.send(embed=embed)
 
     @qotd_group.command(name="remove", aliases=["delete"])

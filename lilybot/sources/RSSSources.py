@@ -3,8 +3,9 @@
 import datetime
 import re
 import xml.etree.ElementTree
-import discord
+
 import aiohttp
+import discord
 
 from .AbstractSources import Source
 

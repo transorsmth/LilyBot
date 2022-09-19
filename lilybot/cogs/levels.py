@@ -18,9 +18,9 @@ from discord.utils import escape_markdown
 from lilybot.bot import LilyBot
 from lilybot.context import LilyBotContext
 from ._utils import *
+from .. import db
 
 blurple = discord.Color.blurple()
-from .. import db
 
 Lily_LOGGER = logging.getLogger(__name__)
 

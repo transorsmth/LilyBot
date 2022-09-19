@@ -1,15 +1,17 @@
 """Cog to post specific 'Hall of Fame' messages in a specific channel"""
 import asyncio
 import logging
+from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 from discord.ext.commands import guild_only, has_permissions
 from discord.utils import escape_markdown
 
 from lilybot.context import LilyBotContext
 from ._utils import *
 from .. import db
+if TYPE_CHECKING:
+    from lilybot import LilyBot
 
 MAX_EMBED = 1024
 LOCK_TIME = .1
@@ -61,7 +63,7 @@ def make_starboard_embed(msg: discord.Message, reaction_count: int):
 class Starboard(Cog):
     """Cog to post specific 'Hall of Fame' messages in a specific channel"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: "LilyBot"):
         super().__init__(bot)
         self.config_cache = db.ConfigCache(StarboardConfig)
         self.locked_messages = set()
@@ -150,7 +152,7 @@ class Starboard(Cog):
         if str(reaction) == config.star_emoji and (reaction.count - self_react) >= config.threshold and \
                 member != msg.guild.me and not await is_cancelled(config.cancel_emoji, msg, msg.guild.me):
             LilyBotLOGGER.debug(f"Starboard threshold reached on message {reaction.message.id} in "
-                               f"{reaction.message.guild.name} from user {member.id}, sending to starboard")
+                                f"{reaction.message.guild.name} from user {member.id}, sending to starboard")
             await self.send_to_starboard(config, msg, reaction.count)
 
         # check if it's gone under the limit

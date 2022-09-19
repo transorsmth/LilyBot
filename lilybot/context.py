@@ -8,14 +8,14 @@ from lilybot import utils
 class LilyBotContext(commands.Context):
     """Cleans all messages before sending"""
 
-    async def send(self, content: str = None, **kwargs):  # pylint: disable=arguments-differ
+    async def send(self, content: str = None, **kwargs) -> discord.Message:  # pylint: disable=arguments-differ
         if content is not None:
             content = utils.clean(self, content, mass=True,
                                   member=False, role=False, channel=False)
 
         return await super().send(content, **kwargs)
 
-    async def reply(self, content: str = None, **kwargs):
+    async def reply(self, content: str = None, **kwargs) -> discord.Message:
         if content is not None:
             content = utils.clean(self, content, mass=True,
                                   member=False, role=False, channel=False)

@@ -35,7 +35,7 @@ class Trigger(Cog):
             embed.set_thumbnail(url=ctx.guild.icon_url)
             embed.description = "No triggers found for this guild! Add one using `{}trigger add <trigger> <response>`".format(
                 ctx.prefix)
-            embed.color = discord.Color.red()
+            embed.colour = discord.Color.red()
             await ctx.send(embed=embed)
             return
         else:
@@ -48,7 +48,7 @@ class Trigger(Cog):
                 embed.description = filter_text
             else:
                 embed.add_field(name="Triggers", value=filter_text)
-            embed.color = discord.Color.dark_orange()
+            embed.colour = discord.Color.dark_orange()
             await ctx.send(embed=embed)
 
     trigger_group.example_usage = """

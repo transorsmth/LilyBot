@@ -4,9 +4,9 @@ import datetime
 import logging
 import math
 import time
+from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 from discord.ext.commands import has_permissions, BadArgument
 from discord.utils import escape_markdown
 
@@ -16,7 +16,8 @@ from .general import blurple
 from .moderation import GuildNewMember
 from .. import db
 from ..components.CustomJoinLeaveMessages import CustomJoinLeaveMessages, format_join_leave, send_log
-
+if TYPE_CHECKING:
+    from lilybot import LilyBot
 Lily_LOGGER = logging.getLogger(__name__)
 
 
@@ -34,7 +35,7 @@ async def embed_paginatorinator(content_name, embed, text):
 class Actionlog(Cog):
     """A cog to handle guild events tasks"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: "LilyBot"):
         super().__init__(bot)
         self.edit_delete_config = db.ConfigCache(GuildMessageLog)
         self.bulk_delete_buffer = {}
@@ -87,7 +88,7 @@ class Actionlog(Cog):
 
         embed = discord.Embed(title="Nickname Changed",
                               color=0x00FFFF)
-        embed.set_author(name=after, icon_url=after.avatar_url)
+        embed.set_author(name=after, icon_url=after.avatar)
         embed.add_field(name="Before", value=before.nick, inline=False)
         embed.add_field(name="After", value=after.nick, inline=False)
 
@@ -252,7 +253,7 @@ class Actionlog(Cog):
         embed = discord.Embed(title="Message Deleted",
                               description=f"Message Deleted In: {message.channel.mention}\nSent by: {message.author.mention}",
                               color=0xFF0000, timestamp=message.created_at)
-        embed.set_author(name=message.author, icon_url=message.author.avatar_url)
+        embed.set_author(name=message.author, icon_url=message.author.avatar)
         if audit:
             if audit.target == message.author:
                 audit_member = await message.guild.fetch_member(audit.user.id)
@@ -327,7 +328,7 @@ class Actionlog(Cog):
                                   description=f"[MESSAGE]({link}) From {before.author.mention}"
                                               f"\nEdited In: {before.channel.mention}", color=0xFFC400,
                                   timestamp=after.edited_at)
-            embed.set_author(name=before.author, icon_url=before.author.avatar_url)
+            embed.set_author(name=before.author, icon_url=before.author.avatar)
             embed.set_footer(text=f"Message ID: {channel_id} - {message_id}\nUserID: {user_id}")
             if len(before.content) + len(after.content) < 5000:
                 embed = await embed_paginatorinator("Original", embed, before.content)
@@ -361,7 +362,7 @@ class Actionlog(Cog):
         """Logs raw member ban events, even if not banned via &ban"""
         audit = await self.check_audit(guild, discord.AuditLogAction.ban)
         embed = discord.Embed(title="User Banned", color=0xff6700)
-        embed.set_thumbnail(url=user.avatar_url)
+        embed.set_thumbnail(url=user.avatar)
         embed.add_field(name="Banned user", value=f"{user}|({user.id})")
         if audit and audit.target == user:
             acton_member = await guild.fetch_member(audit.user.id)

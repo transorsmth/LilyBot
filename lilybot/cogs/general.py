@@ -1,11 +1,13 @@
 """General, basic commands that are common for Discord bots"""
 import inspect
+from typing import Optional
 
 import discord
 from discord.ext.commands import BadArgument, cooldown, BucketType, Group, has_permissions, NotOwner, guild_only
 from discord.utils import escape_markdown
 
 from lilybot.context import LilyBotContext
+from . import _utils
 from ._utils import *
 from ..utils import oauth_url
 
@@ -50,7 +52,7 @@ class General(Cog):
                 else:
                     await self._help_command(ctx, command)
         else:  # Command with subcommand
-            command = ctx.bot.get_command(' '.join(target))
+            command: _utils.Group = ctx.bot.get_command(' '.join(target))
             if command is None:
                 raise BadArgument('that command does not exist!')
             else:
@@ -66,7 +68,7 @@ class General(Cog):
         """Gets the help message for all commands."""
         info = discord.Embed(title='LilyBot: Info',
                              color=discord.Color.blue())
-        info.set_thumbnail(url=self.bot.user.avatar_url)
+        info.set_thumbnail(url=self.bot.user.avatar)
         info.add_field(name='About `{}{}`'.format(ctx.prefix, ctx.invoked_with), value=inspect.cleandoc("""
         This command can show info for all commands, a specific command, or a category of commands.
         Use `{0}{1} {1}` for more information.
@@ -96,7 +98,7 @@ class General(Cog):
                               (command for command in ctx.bot.commands if command.cog is cog),
                               cog_name=type(cog).__name__)
 
-    async def _show_help(self, ctx: LilyBotContext, start_page: discord.Embed, title: str, description: str,
+    async def _show_help(self, ctx: LilyBotContext, start_page: Optional[discord.Embed], title: str, description: str,
                          footer: str, commands, **format_args):
         """Creates and sends a template help message, with arguments filled in."""
         format_args['prefix'] = ctx.prefix
@@ -139,12 +141,12 @@ class General(Cog):
             elif start_page is not None:
                 info_emoji = '\N{INFORMATION SOURCE}'
                 p = Paginator(ctx, (info_emoji, ...), pages, start='info',
-                              auto_remove=ctx.channel.permissions_for(ctx.me))
+                              auto_remove=ctx.channel.permissions_for(ctx.me).manage_messages)
                 async for reaction in p:
                     if reaction == info_emoji:
                         p.go_to_page('info')
             else:
-                await paginate(ctx, pages, auto_remove=ctx.channel.permissions_for(ctx.me))
+                await paginate(ctx, pages, auto_remove=ctx.channel.permissions_for(ctx.me).manage_messages)
         elif start_page:  # No commands - command without subcommands or empty cog - but a usable info page
             await ctx.send(embed=start_page)
         else:  # No commands, and no info page
@@ -179,7 +181,7 @@ class General(Cog):
         perms = 0
         for cmd in ctx.bot.walk_commands():
             perms |= cmd.required_permissions.value
-        await ctx.send('<{}>'.format(oauth_url(ctx.me.id, discord.Permissions(perms))))
+        await ctx.send('<{}>'.format(oauth_url(str(ctx.me.id), discord.Permissions(perms))))
 
     @command(aliases=["setprefix"])
     @guild_only()

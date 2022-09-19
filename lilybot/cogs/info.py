@@ -24,6 +24,7 @@ Lily_LOGGER = logging.getLogger(__name__)
 
 class Info(Cog):
     """Commands for getting information about people and things on Discord."""
+
     @command(aliases=['user', 'memberinfo', 'userinfo'])
     @guild_only()
     @bot_has_permissions(embed_links=True)
@@ -48,7 +49,7 @@ class Info(Cog):
 
         embed = discord.Embed(title=escape_markdown(member.display_name), description=f'{member!s} ({member.id})',
                               color=member.color)
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.avatar)
         embed.add_field(name='Bot Created' if member.bot else 'Account Created',
                         value=member.created_at.strftime(datetime_format), inline=True)
 
@@ -132,6 +133,7 @@ class Info(Cog):
             return f'{values[0]} and {values[1]}'
         else:
             return f'{", ".join(values[:-1])}, and {values[-1]}'
+
     @command()
     @guild_only()
     @cooldown(1, 10, BucketType.channel)
@@ -156,7 +158,6 @@ class Info(Cog):
             embed.set_footer(text=f"Page {page_num + 1} of {math.ceil(len(role.members) / 10)}")
             embeds.append(embed)
         await paginate(ctx, embeds)
-
 
     @guild_only()
     @cooldown(1, 10, BucketType.channel)

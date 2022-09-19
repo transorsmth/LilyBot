@@ -2,14 +2,17 @@
 with whitelisted role exceptions."""
 
 import re
+from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 from discord.ext.commands import guild_only, has_permissions
 
 from lilybot.context import LilyBotContext
 from ._utils import *
 from .. import db
+
+if TYPE_CHECKING:
+    from lilybot import LilyBot
 
 
 class Filter(Cog):
@@ -20,7 +23,7 @@ class Filter(Cog):
     """
     filter_dict = {}
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: "LilyBot"):
         super().__init__(bot)
         self.word_filter_setting = db.ConfigCache(WordFilterSetting)
         self.word_filter_role_whitelist = db.ConfigCache(WordFilterRoleWhitelist)
@@ -128,7 +131,7 @@ class Filter(Cog):
             embed = discord.Embed(title="Filters for {}".format(ctx.guild.name))
             embed.description = "No filters found for this guild! Add one using `{}filter add <regex> [name]`".format(
                 ctx.prefix)
-            embed.color = discord.Color.red()
+            embed.colour = discord.Color.red()
             await ctx.send(embed=embed)
             return
 
@@ -141,7 +144,7 @@ class Filter(Cog):
         embed = discord.Embed()
         embed.title = "Filters for {}".format(ctx.guild.name)
         embed.add_field(name="Filters", value=filter_text)
-        embed.color = discord.Color.dark_orange()
+        embed.colour = discord.Color.dark_orange()
         await self.check_dm_filter(ctx, embed)
 
     filter.example_usage = """`{prefix}filter add test` - Adds test as a filter.

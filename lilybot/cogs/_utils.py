@@ -1,10 +1,11 @@
-"""Utilities for Dozer."""
+"""Utilities for Lilybot."""
 import asyncio
 import inspect
 import logging
 import typing
 from collections.abc import Mapping
 from typing import Dict, Union
+from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
@@ -15,10 +16,13 @@ from discord.ext.commands.core import MISSING
 from lilybot import db
 from lilybot.context import LilyBotContext
 
+if TYPE_CHECKING:
+    from lilybot import LilyBot
+
 __all__ = ['bot_has_permissions', 'command', 'group', 'Cog', 'Reactor', 'Paginator', 'paginate', 'chunk', 'dev_check',
            'DynamicPrefixEntry']
 
-DOZER_LOGGER = logging.getLogger("dozer")
+LILYBOT_LOGGER = logging.getLogger(__name__)
 
 
 class CommandMixin:
@@ -84,7 +88,7 @@ class Group(CommandMixin, commands.HybridGroup):
 
         def decorator(func):
             kwargs.setdefault('parent', self)
-            result = command(name=name, *args, with_app_command=with_app_command, **kwargs)(func)
+            result = command(name=name, with_app_command=with_app_command, **kwargs)(func)
             self.add_command(result)
             return result
 
@@ -101,7 +105,7 @@ class Group(CommandMixin, commands.HybridGroup):
 
         def decorator(func):
             kwargs.setdefault('parent', self)
-            result = group(name=name, *args, with_app_command=with_app_command, **kwargs)(func)
+            result = group(name=name, with_app_command=with_app_command, **kwargs)(func)
             self.add_command(result)
             return result
 
@@ -111,9 +115,9 @@ class Group(CommandMixin, commands.HybridGroup):
 class Cog(commands.Cog):
     """Initiates cogs."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: "LilyBot"):
         super().__init__()
-        self.bot = bot
+        self.bot: "LilyBot" = bot
 
 
 def dev_check():
@@ -191,7 +195,7 @@ class Reactor:
             try:
                 await self.message.remove_reaction(emoji, self.me)
             except discord.errors.NotFound:
-                DOZER_LOGGER.debug("Failed to remove reaction from paginator. Does the messages still exist?")
+                LILYBOT_LOGGER.debug("Failed to remove reaction from paginator. Does the messages still exist?")
 
     def do(self, action):
         """If there's an action reaction, do the action."""
@@ -231,7 +235,7 @@ class Paginator(Reactor):
         '\N{BLACK SQUARE FOR STOP}'  # :stop_button:
     )
 
-    def __init__(self, ctx: LilyBotContext, initial_reactions, pages, *, start: int = 0, auto_remove: bool = True,
+    def __init__(self, ctx: LilyBotContext, initial_reactions, pages, *, start: Union[int, str] = 0, auto_remove: bool = True,
                  timeout: int = 60):
         all_reactions = list(initial_reactions)
         ind = all_reactions.index(Ellipsis)
@@ -350,7 +354,7 @@ class PrefixHandler:
 
     def handler(self, bot, message: discord.Message):
         """Process the dynamic prefix for each message"""
-        dynamic = self.prefix_cache.get(message.guild.id) if message.guild else self.default_prefix
+        dynamic = self.prefix_cache.get(message.guild.id).prefix if message.guild else self.default_prefix
         # <@!> is a nickname mention which discord.py doesn't make by default
         return [f"<@!{bot.user.id}> ", bot.user.mention, dynamic if dynamic else self.default_prefix]
 
@@ -358,8 +362,8 @@ class PrefixHandler:
         """Refreshes the prefix cache"""
         prefixes = await DynamicPrefixEntry.get_by()  # no filters, get all
         for prefix in prefixes:
-            self.prefix_cache[prefix.guild_id] = prefix.prefix
-        DOZER_LOGGER.info(f"{len(prefixes)} prefixes loaded from database")
+            self.prefix_cache[prefix.guild_id] = prefix
+        LILYBOT_LOGGER.info(f"{len(prefixes)} prefixes loaded from database")
 
 
 class DynamicPrefixEntry(db.DatabaseTable):

@@ -1,7 +1,9 @@
 """Holder for the custom join/leave messages database class and the associated methods"""
-from lilybot import db
-import discord
 from logging import getLogger
+
+import discord
+
+from lilybot import db
 
 Lily_LOGGER = getLogger(__name__)
 

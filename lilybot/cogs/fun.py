@@ -50,7 +50,7 @@ class Fun(Cog):
         players = [ctx.author, opponent]
         bossfight = False
         if (ctx.author.id in ctx.bot.config['developers'] or opponent.id in ctx.bot.config[
-                'developers']) or ctx.bot.user.id == opponent.id:
+            'developers']) or ctx.bot.user.id == opponent.id:
             await ctx.send('**Boss Fight started**')
             bossfight = True
             hps = [140000, 140000]
@@ -137,12 +137,12 @@ class Fun(Cog):
         embed.set_footer(text=f"{escape_markdown(opponent.display_name)} react to the ✅ to agree to the fight")
         embed.set_author(name=f"{escape_markdown(ctx.author.display_name)} vs {escape_markdown(opponent.display_name)}")
 
-        msg = await ctx.send(embed=embed)
+        msg: discord.Message = await ctx.send(embed=embed)
         try:
             await msg.add_reaction("✅")
             await msg.add_reaction("❌")
         except discord.Forbidden:
-            raise MissingPermissions(f"**{ctx.bot.user}** does not have the permission to add reacts")
+            raise MissingPermissions(["ADD_REACTIONS"])
         try:
             emoji = None
 

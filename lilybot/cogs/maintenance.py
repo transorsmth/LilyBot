@@ -26,9 +26,9 @@ class Maintenance(Cog):
         """Force-stops the bot."""
         await ctx.send(embed=discord.Embed(title='Shutting down', color=discord.Color.red()))
         Lily_LOGGER.info('Shutting down at request of {}#{} (in {}, #{})'.format(ctx.author.name,
-                                                                                  ctx.author.discriminator,
-                                                                                  ctx.guild.name,
-                                                                                  ctx.channel.name))
+                                                                                 ctx.author.discriminator,
+                                                                                 ctx.guild.name,
+                                                                                 ctx.channel.name))
         await self.bot.shutdown()
 
     shutdown.example_usage = """

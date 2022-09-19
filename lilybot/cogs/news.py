@@ -75,8 +75,8 @@ class News(Cog):
                 channel = self.bot.get_channel(sub.channel_id)
                 if channel is None:
                     Lily_LOGGER.error(f"Channel {sub.channel_id} (sub ID {sub.id}) returned None. Not removing this"
-                                       f"in case it's a discord error, but if discord is fine it's recommended to "
-                                       f"remove this channel manually.")
+                                      f"in case it's a discord error, but if discord is fine it's recommended to "
+                                      f"remove this channel manually.")
                     continue
 
                 if sub.data is None:
@@ -109,8 +109,8 @@ class News(Cog):
 
         next_run = self.get_new_posts.next_iteration
         Lily_LOGGER.debug(f"Done with getting news. Next run in "
-                           f"{(next_run - datetime.datetime.now(datetime.timezone.utc)).total_seconds()}"
-                           f" seconds.")
+                          f"{(next_run - datetime.datetime.now(datetime.timezone.utc)).total_seconds()}"
+                          f" seconds.")
 
     @get_new_posts.error
     async def log_exception(self, _exception: Exception):
@@ -278,7 +278,7 @@ class News(Cog):
                 return
             elif len(sub) > 1:
                 Lily_LOGGER.error(f"More that one subscription of {source.full_name} for channel "
-                                   f"{channel.mention} with data {data} found when attempting to delete.")
+                                  f"{channel.mention} with data {data} found when attempting to delete.")
                 await ctx.send(f"More that one subscription of {source.full_name} for channel {channel.mention} "
                                f"with data {data} found. Please contact the LilyBot administrator for help.")
                 return
@@ -302,7 +302,7 @@ class News(Cog):
                     raise BadArgument("There ware multiple subscriptions found. Try again with a data parameter.")
                 else:
                     Lily_LOGGER.error(f"More than one subscription of {source.full_name} for channel "
-                                       f"{channel.mention} found when attempting to delete.")
+                                      f"{channel.mention} found when attempting to delete.")
                     raise BadArgument(f"More than one subscription of {source.full_name} for channel "
                                       f"{channel.mention} was found. Please contact the LilyBot administrators for help.")
 

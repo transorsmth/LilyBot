@@ -17,6 +17,7 @@ from ..components.ChatbotChannel import ChatbotChannel, ChatbotChannelCache
 from ..components.ChatbotCustom import ChatbotCustom
 from ..components.ChatbotTraining import ChatbotTraining
 from ..components.ChatbotUser import ChatbotUserCache, ChatbotUser
+from ..context import LilyBotContext
 from ..utils import clean
 
 globalratelimit = 2
@@ -136,7 +137,7 @@ class Chat(Cog):
         msg = await ctx.send(embed=embed)
         await self.train_process(part1, part2)
         embed.title = "Trained:"
-        embed.color = discord.Color.green()
+        embed.colour = discord.Color.green()
         await msg.edit(embed=embed)
         await ChatbotTraining.new_training(part1=part1, part2=part2, message_id=message.id, user_id=message.author.id,
                                            user_name=message.author.name, is_manual=True, channel_id=message.channel.id,
@@ -198,13 +199,13 @@ class Chat(Cog):
         embed = discord.Embed(title='Config')
         if not db_channel.train_in:
             embed.description = f"Chatbot already did not train in <#{channel.id}>"
-            embed.color = discord.Color.orange()
+            embed.colour = discord.Color.orange()
         else:
             db_channel.train_in = False
             db_channel.dirty = True
             await self.sync_channel(channel.id, channel.guild.id)
             embed.description = f"Chatbot will not train in <#{channel.id}>"
-            embed.color = discord.Color.green()
+            embed.colour = discord.Color.green()
         await ctx.send(embed=embed)
 
     @config.command()
@@ -222,10 +223,10 @@ class Chat(Cog):
             db_channel.dirty = True
             await self.sync_channel(channel.id, channel.guild.id)
             embed.description = f'Chatbot will now train in channel <#{channel.id}>.'
-            embed.color = discord.Color.green()
+            embed.colour = discord.Color.green()
         else:
             embed.description = f'Chatbot already trained in channel <#{channel.id}>.'
-            embed.color = discord.Color.orange()
+            embed.colour = discord.Color.orange()
         await ctx.send(embed=embed)
 
     @config.command()
@@ -240,13 +241,13 @@ class Chat(Cog):
         embed = discord.Embed(title='Config')
         if not db_channel.respond_in:
             embed.description = f'Chatbot already did not respond in <#{channel.id}>'
-            embed.color = discord.Color.orange()
+            embed.colour = discord.Color.orange()
         else:
             db_channel.respond_in = False
             db_channel.dirty = True
             await self.sync_channel(channel.id, channel.guild.id)
             embed.description = f'Chatbot will not respond in <#{channel.id}>'
-            embed.color = discord.Color.green()
+            embed.colour = discord.Color.green()
         await ctx.send(embed=embed)
 
     @config.command()
@@ -264,11 +265,11 @@ class Chat(Cog):
             db_channel.dirty = True
             await self.sync_channel(channel.id, channel.guild.id)
             embed.description = f'Chatbot will now respond in channel <#{channel.id}>'
-            embed.color = discord.Color.green()
+            embed.colour = discord.Color.green()
         else:
 
             embed.description = f'Chatbot already responded in channel <#{channel.id}>'
-            embed.color = discord.Color.orange()
+            embed.colour = discord.Color.orange()
         await ctx.send(embed=embed)
 
     @command()
@@ -325,7 +326,7 @@ class Chat(Cog):
         await db.Pool.execute("""DROP TABLE tag CASCADE; """)
         await db.Pool.execute("""DROP TABLE tag_association CASCADE; """)
         await ctx.send(embed=discord.Embed(title="Dropped training. Reloading cog.", color=discord.Color.red()))
-        self.bot.reload_extension('chatbot.cogs.chat')
+        await self.bot.reload_extension('chatbot.cogs.chat')
 
     @training.command()
     @dev_check()
@@ -355,7 +356,7 @@ class Chat(Cog):
                                             f"({str(round(int(100 * 100 * (i / len(data)))) / 100)}%)"
                         await msg.edit(embed=embed)
             embed.description = f"Done training. Trained {str(i)} statements"
-            embed.color = discord.Color.green()
+            embed.colour = discord.Color.green()
             await msg.edit(embed=embed)
         except Exception as e:
             await msg.edit(embed=discord.Embed(title="Training corpus", description="Error. ",
@@ -533,7 +534,7 @@ class Chat(Cog):
             embed.set_thumbnail(url=ctx.guild.icon_url)
             embed.description = "No triggers found for this guild! Add one using `{}trigger add <regex> [user]`".format(
                 ctx.prefix)
-            embed.color = discord.Color.red()
+            embed.colour = discord.Color.red()
             await ctx.send(embed=embed)
             return
         for result in results:
@@ -550,7 +551,7 @@ class Chat(Cog):
             embed.description = filter_text
         else:
             embed.add_field(name="Triggers", value=filter_text)
-        embed.color = discord.Color.dark_orange()
+        embed.colour = discord.Color.dark_orange()
         await ctx.send(embed=embed)
 
     trigger.example_usage = """
@@ -633,7 +634,7 @@ class Chat(Cog):
         if isinstance(message.channel, discord.DMChannel):
             return
 
-        ctx = await self.bot.get_context(message)
+        ctx: LilyBotContext = await self.bot.get_context(message)
         if message.content.lower().startswith(ctx.prefix):
             return
         author = await self.load_user(message.author.id)

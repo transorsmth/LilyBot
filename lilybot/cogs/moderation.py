@@ -18,6 +18,8 @@ from ._utils import *
 from .general import blurple
 from .. import db
 from ..components.CustomJoinLeaveMessages import send_log
+if typing.TYPE_CHECKING:
+    from lilybot import LilyBot
 
 __all__ = ["SafeRoleConverter", "Moderation", "NewMemPurgeConfig", "GuildNewMember"]
 
@@ -43,7 +45,7 @@ class SafeRoleConverter(RoleConverter):
 class Moderation(Cog):
     """A cog to handle moderation tasks."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: "LilyBot"):
         super().__init__(bot)
         self.links_config = db.ConfigCache(GuildMessageLinks)
 
@@ -643,7 +645,6 @@ class Moderation(Cog):
     @discord.ext.commands.cooldown(rate=10, per=2,
                                    type=discord.ext.commands.BucketType.guild)  # 10 seconds per 2 members in the guild
     async def selfdeafen(self, ctx: LilyBotContext, *, reason: str = "No reason provided"):
-
         """Deafen yourself for a given time period to prevent you from reading or sending message."""
         async with ctx.typing():
             seconds = self.hm_to_seconds(reason)

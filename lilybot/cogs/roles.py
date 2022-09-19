@@ -5,7 +5,6 @@ import typing
 
 import discord
 import discord.utils
-from discord.ext import commands
 from discord.ext.commands import cooldown, BucketType, has_permissions, BadArgument, guild_only
 from discord.utils import escape_markdown
 
@@ -15,6 +14,9 @@ from .actionlogs import CustomJoinLeaveMessages
 from .. import db
 from ..db import *
 
+if typing.TYPE_CHECKING:
+    from lilybot import LilyBot
+
 blurple = discord.Color.blurple()
 
 Lily_LOGGER = logging.getLogger(__name__)
@@ -23,7 +25,7 @@ Lily_LOGGER = logging.getLogger(__name__)
 class Roles(Cog):
     """Commands for role management."""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: "LilyBot"):
         super().__init__(bot)
         for command in self.giveme.walk_commands():
             @command.before_invoke
@@ -261,7 +263,7 @@ class Roles(Cog):
                 await msg.delete()
             except discord.HTTPException:
                 Lily_LOGGER.debug(
-                    f"Unable to delete message to {ctx.member} in guild {ctx.guild} Reason: HTTPException")
+                    f"Unable to delete message to {ctx.author} in guild {ctx.guild} Reason: HTTPException")
             try:
                 await ctx.message.delete()
             except discord.Forbidden:
@@ -271,7 +273,7 @@ class Roles(Cog):
                 await msg.clear_reactions()
             except discord.HTTPException:
                 Lily_LOGGER.debug(
-                    f"Unable to clear reactions from message to {ctx.member} in guild {ctx.guild} Reason: HTTPException")
+                    f"Unable to clear reactions from message to {ctx.author} in guild {ctx.guild} Reason: HTTPException")
             return
 
     giveme.example_usage = """
@@ -384,7 +386,7 @@ class Roles(Cog):
                 await msg.delete()
             except discord.HTTPException:
                 Lily_LOGGER.debug(
-                    f"Unable to delete message to {ctx.member} in guild {ctx.guild} Reason: HTTPException")
+                    f"Unable to delete message to {ctx.author} in guild {ctx.guild} Reason: HTTPException")
             try:
                 await ctx.message.delete()
             except discord.Forbidden:
@@ -394,7 +396,7 @@ class Roles(Cog):
                 await msg.clear_reactions()
             except discord.HTTPException:
                 Lily_LOGGER.debug(
-                    f"Unable to clear reactions from message to {ctx.member} in guild {ctx.guild} Reason: HTTPException")
+                    f"Unable to clear reactions from message to {ctx.author} in guild {ctx.guild} Reason: HTTPException")
             return
 
     remove.example_usage = """
@@ -479,7 +481,7 @@ class Roles(Cog):
     @command()
     @bot_has_permissions(manage_roles=True, embed_links=True)
     @has_permissions(manage_roles=True)
-    async def tempgive(self, ctx: LilyBotContext, member: discord.Member, length: int, *, role: discord.Role):
+    async def tempgive(self, ctx: LilyBotContext, member: discord.Member, length: str, *, role: discord.Role):
         """Temporarily gives a member a role for a set time. Not restricted to giveable roles."""
         if role > ctx.author.top_role:
             raise BadArgument('Cannot give roles higher than your top role!')

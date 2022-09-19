@@ -5,7 +5,7 @@ import os
 import re
 import sys
 import traceback
-from typing import Pattern
+from typing import Pattern, Optional, Union
 
 import discord
 from discord.ext import commands
@@ -17,7 +17,7 @@ from .cogs._utils import CommandMixin
 from .context import LilyBotContext
 from .db import db_init, db_migrate
 
-LilyBot_LOGGER = logging.getLogger('LilyBot')
+LilyBot_LOGGER = logging.getLogger(__name__)
 LilyBot_LOGGER.level = logging.INFO
 LilyBot_HANDLER = logging.StreamHandler(stream=sys.stdout)
 LilyBot_HANDLER.level = logging.INFO
@@ -26,10 +26,10 @@ LilyBot_HANDLER.setFormatter(fmt=logging.Formatter('[%(asctime)s] [%(levelname)s
 
 if discord.version_info.major < 2:
     LilyBot_LOGGER.error("Your installed discord.py version is too low "
-                       "%d.%d.%d, please upgrade to at least 2.0.0",
-                       discord.version_info.major,
-                       discord.version_info.minor,
-                       discord.version_info.micro)
+                         "%d.%d.%d, please upgrade to at least 2.0.0",
+                         discord.version_info.major,
+                         discord.version_info.minor,
+                         discord.version_info.micro)
     sys.exit(1)
 
 
@@ -73,7 +73,7 @@ class LilyBot(commands.Bot):
                 perms |= cmd.required_permissions.value
             else:
                 LilyBot_LOGGER.warning(f"Command {cmd} not subclass of LilyBot type.")
-        LilyBot_LOGGER.debug('Bot Invite: {}'.format(utils.oauth_url(self.user.id, discord.Permissions(perms))))
+        LilyBot_LOGGER.debug('Bot Invite: {}'.format(utils.oauth_url(str(self.user.id), discord.Permissions(perms))))
         if self.config['is_backup']:
             status = discord.Status.dnd
         else:
@@ -83,11 +83,14 @@ class LilyBot(commands.Bot):
             await self.change_presence(activity=activity, status=status)
         except TypeError:
             LilyBot_LOGGER.warning("You are running an older version of the discord.py rewrite (with breaking changes)! "
-                                 "To upgrade, run `pip install -r requirements.txt --upgrade`")
+                                   "To upgrade, run `pip install -r requirements.txt --upgrade`")
 
     async def get_context(self, message: discord.Message, *, cls=LilyBotContext):  # pylint: disable=arguments-differ
         ctx = await super().get_context(message, cls=cls)
         return ctx
+
+    async def get_command(self, name: str, /) -> Optional[Union[_utils.Command, _utils.Group]]:
+        return super().get_command(name)
 
     async def on_command_error(self, context: LilyBotContext, exception):  # pylint: disable=arguments-differ
         if isinstance(exception, commands.NoPrivateMessage):
@@ -126,12 +129,12 @@ class LilyBot(commands.Bot):
                 '```\n%s\n```' % ''.join(traceback.format_exception_only(type(exception), exception)).strip())
             if isinstance(context.channel, discord.TextChannel):
                 LilyBot_LOGGER.error('Error in command <%d> (%d.name!r(%d.id) %d(%d.id) %d(%d.id) %d)',
-                                   context.command, context.guild, context.guild, context.channel, context.channel,
-                                   context.author, context.author, context.message.content)
+                                     context.command, context.guild, context.guild, context.channel, context.channel,
+                                     context.author, context.author, context.message.content)
             else:
                 LilyBot_LOGGER.error('Error in command <%d> (DM %d(%d.id) %d)', context.command,
-                                   context.channel.recipient,
-                                   context.channel.recipient, context.message.content)
+                                     context.channel.recipient,
+                                     context.channel.recipient, context.message.content)
             LilyBot_LOGGER.error(''.join(traceback.format_exception(type(exception), exception, exception.__traceback__)))
 
     async def on_error(self, event_method, *args, **kwargs):

@@ -33,7 +33,7 @@ class Development(Cog):
         """Reloads a cog."""
         extension = 'lilybot.cogs.' + cog
         msg = await ctx.send('Reloading extension %s' % extension)
-        self.bot.reload_extension(extension)
+        await self.bot.reload_extension(extension)
         await msg.edit(content='Reloaded extension %s' % extension)
 
     reload.example_usage = """
@@ -97,11 +97,11 @@ class Development(Cog):
             ret = await locals_['evaluated_function'](ctx)
 
             e.title = 'Python Evaluation - Success'
-            e.color = 0x00FF00
+            e.colour = 0x00FF00
             e.add_field(name='Output', value='```\n%s (%s)\n```' % (repr(ret), type(ret).__name__), inline=False)
         except Exception as err:
             e.title = 'Python Evaluation - Error'
-            e.color = 0xFF0000
+            e.colour = 0xFF0000
             e.add_field(name='Error', value='```\n%s\n```' % repr(err))
         await ctx.send('', embed=e)
 

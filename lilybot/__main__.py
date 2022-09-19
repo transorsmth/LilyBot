@@ -53,13 +53,13 @@ if config['sentry_url'] != "":
         traces_sample_rate=1.0,
     )
 
-
 if 'discord_token' not in config:
     sys.exit('Discord token must be supplied in configuration')
 
 if sys.version_info < (3, 8):
-    sys.exit('Dozer requires Python 3.8 or higher to run. This is version %s.' % '.'.join(sys.version_info[:3]))
+    sys.exit('Lilybot requires Python 3.8 or higher to run. This is version %s.' % '.'.join(sys.version_info[:3]))
 
+# noinspection PyPep8
 from . import LilyBot  # After version check
 
 intents = discord.Intents.default()

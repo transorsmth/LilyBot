@@ -1,6 +1,7 @@
 """Get new posts from any arbitrary subreddit"""
 import datetime
 import logging
+
 import aiohttp
 import discord
 
@@ -53,7 +54,7 @@ class RedditSource(DataBasedSource):
             self.access_token = response['access_token']
         except KeyError:
             Lily_LOGGER.critical(f"Error in {self.full_name} Token Get: {response['message']}. Switching to "
-                                  f"non-OAuth API")
+                                 f"non-OAuth API")
             self.oauth_disabled = True
             return
 
@@ -168,7 +169,7 @@ class RedditSource(DataBasedSource):
                 subreddit_obj = await self.clean_data(subreddit)
             except DataBasedSource.InvalidDataException:
                 Lily_LOGGER.error(f"Subreddit {subreddit} failed. Database won't be updated right now but this "
-                                   f"subreddit won't be checked from now on.")
+                                  f"subreddit won't be checked from now on.")
                 continue
             self.subreddits[subreddit_obj.name] = subreddit_obj
         await self.get_new_posts(first_time=True)
