@@ -1,5 +1,5 @@
 """Maintenance commands for bot developers"""
-import logging
+from loguru import logger
 import os
 
 import discord
@@ -7,7 +7,7 @@ from discord.ext.commands import NotOwner
 
 from ._utils import *
 
-Lily_LOGGER = logging.getLogger(__name__)
+
 
 
 class Maintenance(Cog):
@@ -25,7 +25,7 @@ class Maintenance(Cog):
     async def shutdown(self, ctx):
         """Force-stops the bot."""
         await ctx.send(embed=discord.Embed(title='Shutting down', color=discord.Color.red()))
-        Lily_LOGGER.info('Shutting down at request of {}#{} (in {}, #{})'.format(ctx.author.name,
+        logger.info('Shutting down at request of {}#{} (in {}, #{})'.format(ctx.author.name,
                                                                                  ctx.author.discriminator,
                                                                                  ctx.guild.name,
                                                                                  ctx.channel.name))

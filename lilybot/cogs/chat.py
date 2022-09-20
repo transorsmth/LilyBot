@@ -1,6 +1,6 @@
 """Records members' XP and level."""
 import asyncio
-import logging
+from loguru import logger
 import re
 
 import aiohttp
@@ -24,7 +24,7 @@ globalratelimit = 2
 clearcache = True
 cachelimit = 1000
 blurple = discord.Color.blurple()
-Lily_LOGGER = logging.getLogger(__name__)
+
 
 
 class Chat(Cog):
@@ -290,7 +290,7 @@ class Chat(Cog):
                     await channel.send(embed=embed)
                     complete += 1
                 except Exception as e:
-                    Lily_LOGGER.error(e)
+                    logger.error(e)
                     error += 1
             embed.add_field(name="Complete", value=str(complete))
             embed.add_field(name="Error", value=str(error))
@@ -416,7 +416,7 @@ class Chat(Cog):
             except Exception as e:
                 capture_exception()
                 training_status[a] = "Error"
-                Lily_LOGGER.error(e)
+                logger.error(e)
 
         embed = discord.Embed(title="Trained corpus", color=discord.Color.green())
         for b in things_to_train:
@@ -427,7 +427,7 @@ class Chat(Cog):
         """Check to see if a member is in the level cache and if not load from the database"""
         cached_channel = self._channel_cache.get(channel_id)
         if cached_channel is None:
-            Lily_LOGGER.debug("Cache miss: channel_id = %d", channel_id)
+            logger.debug("Cache miss: channel_id = %d", channel_id)
             cached_channel = await ChatbotChannelCache.from_channel_id(channel_id=channel_id, guild_id=guild_id)
             self._channel_cache[channel_id] = cached_channel
         return cached_channel
@@ -436,7 +436,7 @@ class Chat(Cog):
         """Check to see if a member is in the level cache and if not load from the database"""
         cached_user = self._user_cache.get(user_id)
         if cached_user is None:
-            Lily_LOGGER.debug("Cache miss: user_id = %d", user_id)
+            logger.debug("Cache miss: user_id = %d", user_id)
             cached_user = await ChatbotUserCache.from_user_id(user_id=user_id)
             self._user_cache[user_id] = cached_user
         return cached_user
@@ -762,7 +762,7 @@ class Chat(Cog):
             cached_user.dirty = False
 
         if not to_write:
-            Lily_LOGGER.debug("Sync task skipped, nothing to do")
+            logger.debug("Sync task skipped, nothing to do")
             return
         # Query written manually to insert all records at once
         try:
@@ -773,10 +773,10 @@ class Chat(Cog):
                     f" SET banned = EXCLUDED.banned, messages = EXCLUDED.messages, "
                     f"user_name = EXCLUDED.user_name;",
                     to_write)
-            Lily_LOGGER.debug(
+            logger.debug(
                 f"Inserted/updated {len(to_write)} record(s); Evicted {evicted} records(s)")
         except Exception as e:
-            Lily_LOGGER.error(
+            logger.error(
                 f"Failed to sync user cache to db, Reason:{e}")
 
     async def sync_channels_to_database(self):
@@ -801,7 +801,7 @@ class Chat(Cog):
             cached_channel.dirty = False
 
         if not to_write:
-            Lily_LOGGER.debug("Sync task skipped, nothing to do")
+            logger.debug("Sync task skipped, nothing to do")
             return
         # Query written manually to insert all records at once
         try:
@@ -817,10 +817,10 @@ class Chat(Cog):
                                        f"trained_messages = EXCLUDED.trained_messages, channel_name = "
                                        f"EXCLUDED.channel_name;",
                                        to_write)
-            Lily_LOGGER.debug(
+            logger.debug(
                 f"Inserted/updated {len(to_write)} record(s); Evicted {evicted} records(s)")
         except Exception as e:
-            Lily_LOGGER.error(
+            logger.error(
                 f"Failed to sync channels cache to db, Reason:{e}")
 
 

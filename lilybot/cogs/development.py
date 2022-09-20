@@ -1,6 +1,6 @@
 """Commands specific to development. Only approved developers can use these commands."""
 import copy
-import logging
+from loguru import logger
 import re
 import subprocess
 
@@ -9,8 +9,6 @@ from discord.ext.commands import NotOwner
 
 from lilybot.context import LilyBotContext
 from ._utils import *
-
-Lily_LOGGER = logging.getLogger(__name__)
 
 
 class Development(Cog):
@@ -45,12 +43,12 @@ class Development(Cog):
         """
         Runs shell commands sent.
         """
-        Lily_LOGGER.info(
+        logger.info(
             f"Evaluating shell command at request of {ctx.author} ({ctx.author.id}) in '{ctx.guild}' #{ctx.channel}:")
-        Lily_LOGGER.info("-" * 32)
+        logger.info("-" * 32)
         for line in code.splitlines():
-            Lily_LOGGER.info(line)
-        Lily_LOGGER.info("-" * 32)
+            logger.info(line)
+        logger.info("-" * 32)
         msg = await ctx.send(embed=discord.Embed(title="Evaluating command", color=discord.Color.orange()))
         try:
             output = subprocess.check_output(code, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
@@ -82,12 +80,12 @@ class Development(Cog):
         else:
             code = code.strip('`').strip()  # Remove single-line code blocks, if necessary
 
-        Lily_LOGGER.info(
+        logger.info(
             f"Evaluating code at request of {ctx.author} ({ctx.author.id}) in '{ctx.guild}' #{ctx.channel}:")
-        Lily_LOGGER.info("-" * 32)
+        logger.info("-" * 32)
         for line in code.splitlines():
-            Lily_LOGGER.info(line)
-        Lily_LOGGER.info("-" * 32)
+            logger.info(line)
+        logger.info("-" * 32)
 
         e = discord.Embed(type='rich')
         e.add_field(name='Code', value='```py\n%s\n```' % code, inline=False)
@@ -119,11 +117,11 @@ class Development(Cog):
         context = await self.bot.get_context(msg)
         context.is_pseudo = True  # adds new flag to bypass ratelimit
         # let's also add a log of who ran pseudo
-        Lily_LOGGER.info(
+        logger.info(
             f"Running pseudo on request of {ctx.author} ({ctx.author.id}) in '{ctx.guild}' #{ctx.channel}:")
-        Lily_LOGGER.info("-" * 32)
-        Lily_LOGGER.info(ctx.message.content)
-        Lily_LOGGER.info("-" * 32)
+        logger.info("-" * 32)
+        logger.info(ctx.message.content)
+        logger.info("-" * 32)
         await self.bot.invoke(context)
 
     pseudo.example_usage = """

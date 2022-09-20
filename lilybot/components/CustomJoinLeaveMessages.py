@@ -5,7 +5,7 @@ import discord
 
 from lilybot import db
 
-Lily_LOGGER = getLogger(__name__)
+logger = getLogger(__name__)
 
 
 async def send_log(member):
@@ -21,7 +21,7 @@ async def send_log(member):
             try:
                 await channel.send(content=member.mention if config[0].ping else None, embed=embed)
             except discord.Forbidden:
-                Lily_LOGGER.warning(
+                logger.warning(
                     f"Guild {member.guild}({member.guild.id}) has invalid permissions for join/leave logs")
 
 

@@ -6,6 +6,7 @@ import sys
 
 import discord
 import sentry_sdk
+from loguru import logger
 
 config = {
     'prefix': '&', 'developers': [],
@@ -58,6 +59,13 @@ if 'discord_token' not in config:
 
 if sys.version_info < (3, 8):
     sys.exit('Lilybot requires Python 3.8 or higher to run. This is version %s.' % '.'.join(sys.version_info[:3]))
+
+# logger setup
+logger_format = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{" \
+                "name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{" \
+                "message}</level> "
+logger.remove()
+logger.add(sys.stdout, format=logger_format, level="DEBUG" if config['debug'] else "INFO", enqueue=True, colorize=True)
 
 # noinspection PyPep8
 from . import LilyBot  # After version check

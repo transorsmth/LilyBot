@@ -2,7 +2,7 @@
 
 import asyncio
 import json
-import logging
+from loguru import logger
 import math
 import os
 from datetime import timezone, datetime
@@ -18,7 +18,7 @@ from ._utils import *
 from .general import blurple
 from .. import db
 
-Lily_LOGGER = logging.getLogger(__name__)
+
 
 TIMEZONE_FILE = "timezones.json"
 
@@ -31,11 +31,11 @@ class Management(Cog):
         self.started_timers = False
         self.timers = {}
         if os.path.isfile(TIMEZONE_FILE):
-            Lily_LOGGER.info("Loaded timezone configurations")
+            logger.info("Loaded timezone configurations")
             with open(TIMEZONE_FILE) as f:
                 self.timezones = json.load(f)
         else:
-            Lily_LOGGER.error("Unable to load timezone configurations")
+            logger.error("Unable to load timezone configurations")
             self.timezones = {}
 
     @Cog.listener('on_ready')
@@ -49,9 +49,9 @@ class Management(Cog):
                 self.timers[message.request_id] = task
                 started += 1
             self.started_timers = True
-            Lily_LOGGER.info(f"Started {started}/{len(messages)} scheduled messages")
+            logger.info(f"Started {started}/{len(messages)} scheduled messages")
         else:
-            Lily_LOGGER.info("Client Resumed: Timers still running")
+            logger.info("Client Resumed: Timers still running")
 
     async def msg_timer(self, db_entry):
         """Holds the futures for sending a message"""
@@ -67,12 +67,12 @@ class Management(Cog):
                               description=db_entry.content)
         guild = self.bot.get_guild(db_entry.guild_id)
         if not guild:
-            Lily_LOGGER.warning(
+            logger.warning(
                 f"Attempted to schedulesend message in guild({db_entry.guild_id}); Guild no longer exist")
             return
         channel = guild.get_channel(db_entry.channel_id if not channel_override else channel_override)
         if not channel:
-            Lily_LOGGER.warning(f"Attempted to schedulesend message in guild({guild}), channel({db_entry.channel_id});"
+            logger.warning(f"Attempted to schedulesend message in guild({guild}), channel({db_entry.channel_id});"
                                 f" Channel no longer exist")
             return
         embed.colour = blurple
@@ -83,7 +83,7 @@ class Management(Cog):
         if perms.send_messages:
             await channel.send(embed=embed)
         else:
-            Lily_LOGGER.warning((f"Attempted to schedulesend message in guild({guild}:{guild.id}), channel({channel});"
+            logger.warning((f"Attempted to schedulesend message in guild({guild}:{guild.id}), channel({channel});"
                                  f" Client lacks send permissions"))
 
     @group(invoke_without_command=True)

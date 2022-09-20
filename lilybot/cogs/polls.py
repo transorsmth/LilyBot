@@ -6,7 +6,7 @@ from discord.ext.commands import has_permissions
 
 from ._utils import *
 
-Lily_LOGGER = getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class Polls(Cog):
@@ -19,7 +19,7 @@ class Polls(Cog):
         try:
             await ctx.message.delete()
         except discord.Forbidden:
-            Lily_LOGGER.debug("Could not delete poll invoke message. ")
+            logger.debug("Could not delete poll invoke message. ")
         # Separate title and options
         splitted = poll_options.split('" ')
         title = splitted[0].replace('"', '')

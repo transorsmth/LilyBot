@@ -3,7 +3,7 @@
 import asyncio
 import functools
 import itertools
-import logging
+from loguru import logger
 import math
 import random
 import typing
@@ -22,7 +22,7 @@ from .. import db
 
 blurple = discord.Color.blurple()
 
-Lily_LOGGER = logging.getLogger(__name__)
+
 
 ADD_LIMIT = 2147483647
 LEVEL_SET_LIMIT = 100000
@@ -54,7 +54,7 @@ class Levels(Cog):
         # > The formula to calculate how many xp you need for the next level is 5 * (lvl ^ 2) + 50 * lvl + 100 with
         # > your current level as lvl
         if level >= LEVEL_CALC_LIMIT:  # If the level gets too big, LilyBot will hang trying to calculate the level. A better way needs to
-            Lily_LOGGER.critical(
+            logger.critical(
                 "Member XP exceeded maximum calculation limit")  # be found to calculate level's but this is the best for now
             return LEVEL_CALC_LIMIT
         needed = 0
@@ -80,10 +80,10 @@ class Levels(Cog):
     async def preload_cache(self):
         """Load all guild settings from the database."""
         await self.bot.wait_until_ready()
-        Lily_LOGGER.info("Preloading guild settings")
+        logger.info("Preloading guild settings")
         await self.update_server_settings_cache()
         await self.update_level_role_cache()
-        Lily_LOGGER.info(
+        logger.info(
             f"Loaded settings for {len(self.guild_settings)} guilds; and {len(self._level_roles)} level roles")
         # Load subset of member XP records here?
 
@@ -142,7 +142,7 @@ class Levels(Cog):
                 await member.add_roles(*add_roles, reason="Level Up")
                 await member.remove_roles(*del_roles, reason="Level Up")
             except discord.Forbidden:
-                Lily_LOGGER.debug(f"Unable to add roles to {member} in guild {guild} Reason: Forbidden")
+                logger.debug(f"Unable to add roles to {member} in guild {guild} Reason: Forbidden")
 
     async def check_level_up(self, guild: discord.Guild, member: discord.Member, old_xp: int, new_xp: int):
         """Check and see if a member has ranked up, and then send a message if enabled"""
@@ -159,13 +159,13 @@ class Levels(Cog):
         """Check to see if a member is in the level cache and if not load from the database"""
         cached_member = self._xp_cache.get((guild_id, member_id))
         if cached_member is None:
-            Lily_LOGGER.debug("Cache miss: guild_id=%d, user_id=%d", guild_id, member_id)
+            logger.debug("Cache miss: guild_id=%d, user_id=%d", guild_id, member_id)
             records = await MemberXP.get_by(guild_id=guild_id, user_id=member_id)
             if records:
-                Lily_LOGGER.debug("Loading from database")
+                logger.debug("Loading from database")
                 cached_member = MemberXPCache.from_record(records[0])
             else:
-                Lily_LOGGER.debug("Creating from scratch")
+                logger.debug("Creating from scratch")
                 cached_member = MemberXPCache(0, datetime.now(tz=timezone.utc), 0, True)
             self._xp_cache[(guild_id, member_id)] = cached_member
         return cached_member
@@ -202,7 +202,7 @@ class Levels(Cog):
             cached_member.dirty = False
 
         if not to_write:
-            Lily_LOGGER.debug("Sync task skipped, nothing to do")
+            logger.debug("Sync task skipped, nothing to do")
             return
         # Query written manually to insert all records at once
         try:
@@ -213,9 +213,9 @@ class Levels(Cog):
                                        f" SET total_xp = EXCLUDED.total_xp, total_messages = EXCLUDED.total_messages, "
                                        f"last_given_at = EXCLUDED.last_given_at",
                                        to_write)
-            Lily_LOGGER.debug(f"Inserted/updated {len(to_write)} record(s); Evicted {evicted} records(s)")
+            logger.debug(f"Inserted/updated {len(to_write)} record(s); Evicted {evicted} records(s)")
         except Exception as e:
-            Lily_LOGGER.error(f"Failed to sync levels cache to db, Reason:{e}")
+            logger.error(f"Failed to sync levels cache to db, Reason:{e}")
 
     @loop(minutes=2.5)
     async def sync_task(self):
@@ -242,10 +242,10 @@ class Levels(Cog):
         try:
             exc = task.exception()
         except asyncio.CancelledError:
-            Lily_LOGGER.warning("Task syncing records was cancelled prematurely, restarting")
+            logger.warning("Task syncing records was cancelled prematurely, restarting")
         else:
             # exc could be None if the task returns normally, but that would also be an error
-            Lily_LOGGER.error("Task syncing records failed: %r", exc)
+            logger.error("Task syncing records failed: %r", exc)
         finally:
             self.sync_task.start()
 
@@ -297,7 +297,7 @@ class Levels(Cog):
         """Function to scrap ranking data from the mee6 api and save it to the database"""
         guild_id = ctx.guild.id
         progress_template = "Currently syncing from Mee6 API please wait... Page: {page}"
-        Lily_LOGGER.info(
+        logger.info(
             f"Syncing Mee6 level data for {ctx.guild.member_count} members from guild {ctx.guild}({guild_id})")
 
         if self.guild_settings.get(guild_id):
@@ -329,7 +329,7 @@ class Levels(Cog):
 
         await self.update_server_settings_cache()  # We refresh the settings cache to return the settings back to previous values
         await msg.edit(content="Levels data successfully synced from Mee6")
-        Lily_LOGGER.info(f"Successfully synced Mee6 data for guild {ctx.guild}({guild_id})")
+        logger.info(f"Successfully synced Mee6 data for guild {ctx.guild}({guild_id})")
 
     meesyncs.example_usage = """
     `{prefix}meesyncs`: Sync ranking data from the mee6 API to LilyBot's database
@@ -387,7 +387,7 @@ class Levels(Cog):
             raise BadArgument("Requested level is too high!")
         entry = await self.load_member(ctx.guild.id, member.id)
         xp = self.total_xp_for_level(level)
-        Lily_LOGGER.debug(f"Adjusting xp for user {member.id} to {xp}")
+        logger.debug(f"Adjusting xp for user {member.id} to {xp}")
         entry.total_xp = xp
         await self.sync_member(ctx.guild.id, member.id)  # Sync just this member to the db
         e = discord.Embed(color=blurple)

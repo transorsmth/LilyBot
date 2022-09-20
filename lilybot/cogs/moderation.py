@@ -1,7 +1,7 @@
 """Provides moderation commands for LilyBot."""
 import asyncio
 import datetime
-import logging
+from loguru import logger
 import re
 import time
 import typing
@@ -25,7 +25,7 @@ __all__ = ["SafeRoleConverter", "Moderation", "NewMemPurgeConfig", "GuildNewMemb
 
 MAX_PURGE = 1000
 
-Lily_LOGGER = logging.getLogger(__name__)
+
 
 
 class SafeRoleConverter(RoleConverter):
@@ -119,7 +119,7 @@ class Moderation(Cog):
                     try:
                         await channel.send(embed=modlog_embed)
                     except discord.Forbidden as e:
-                        Lily_LOGGER.warning(
+                        logger.warning(
                             f"Unable to send modlog in guild \"{channel.guild}\" ({channel.guild.id}) reason {e}")
         else:
             if orig_channel is not None:
@@ -134,7 +134,7 @@ class Moderation(Cog):
                 try:
                     await channel.set_permissions(target=member, overwrite=None if overwrite.is_empty() else overwrite)
                 except discord.Forbidden as e:
-                    Lily_LOGGER.error(
+                    logger.error(
                         f"Failed to catch missing perms in {channel} ({channel.id}) Guild: {channel.guild.id}; Error: {e}")
 
     hm_regex = re.compile(

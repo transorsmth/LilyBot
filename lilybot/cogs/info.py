@@ -1,5 +1,5 @@
 """Provides commands for pulling certain information."""
-import logging
+from loguru import logger
 import math
 import typing
 from datetime import timezone, datetime
@@ -19,7 +19,7 @@ from ..components.ChatbotUser import ChatbotUser
 blurple = discord.Color.blurple()
 datetime_format = '%Y-%m-%d %H:%M:%S\nUTC'
 
-Lily_LOGGER = logging.getLogger(__name__)
+
 
 
 class Info(Cog):
@@ -192,7 +192,7 @@ class Info(Cog):
                     if result.respond_in:
                         channels += ' <#{}>'.format(result.channel_id)
                 except discord.NotFound:
-                    Lily_LOGGER.debug("Ignoring channel does not exist, and not adding channel to list. ")
+                    logger.debug("Ignoring channel does not exist, and not adding channel to list. ")
             if channels == "":
                 channels = "The bot does not respond in any channels."
             if train_channels == "":
