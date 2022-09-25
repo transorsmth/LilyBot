@@ -82,7 +82,7 @@ async def load_cogs():
     """Loads cogs for startup"""
     for ext in os.listdir('lilybot/cogs'):
         if not ext.startswith(('_', '.')):
-            await bot.load_extension('dozer.cogs.' + ext[:-3])  # Remove '.py'
+            await bot.load_extension('lilybot.cogs.' + ext[:-3])  # Remove '.py'
 
 
 bot.run()

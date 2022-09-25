@@ -26,7 +26,6 @@ cachelimit = 1000
 blurple = discord.Color.blurple()
 
 
-
 class Chat(Cog):
     """Commands and event handlers for chatting with the bot"""
 
