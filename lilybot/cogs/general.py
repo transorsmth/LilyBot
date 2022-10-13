@@ -72,26 +72,21 @@ class General(Cog):
     
     async def _help_all(self, ctx: LilyBotContext):
         """Gets the help message for all commands."""
-        info: Embed = Embed(title='Dozer: Info', description='A guild management bot for FIRST Discord servers',
+        info: Embed = Embed(title='LilyBot: Info', description='A guild management bot for FIRST Discord servers',
                             color=discord.Color.blue())
         info.set_thumbnail(url=self.bot.user.avatar)
         info.add_field(name='About',
-                       value="Dozer: A collaborative bot for FIRST Discord servers, developed by the FRC Discord Server Development Team")
+                       value="LilyBot: A bot for all things Lily. ")
         info.add_field(name='About `{}{}`'.format(ctx.prefix, ctx.invoked_with), value=inspect.cleandoc("""
             This command can show info for all commands, a specific command, or a category of commands.
             Use `{0}{1} {1}` for more information.
             """.format(ctx.prefix, ctx.invoked_with)), inline=False)
     
         info.add_field(name="Open Source",
-                       value="Dozer is open source! Feel free to view and contribute to our Python code "
-                             "[on Github](https://github.com/FRCDiscord/Dozer)", inline=False)
-        info.add_field(name='Support',
-                       value="If you have any questions or comments you can join our [support server](https://discord.gg/bB8tcQ8) ")
-        info.add_field(name="Privacy",
-                       value="We are fully committed to protecting your privacy. "
-                             "You can view our privacy policy [here](https://github.com/FRCDiscord/Dozer/blob/master/privacy.md)")
-        info.set_footer(text='Dozer Help | all commands | Info page')
-        await self._show_help(ctx, info, 'Dozer: Commands', '', 'all commands', ctx.bot.commands)
+                       value="LilyBot is open source! Feel free to view and contribute to our Python code "
+                             "[on Github](https://github.com/bcurbs/lilybot)", inline=False)
+        info.set_footer(text='LilyBot Help | all commands | Info page')
+        await self._show_help(ctx, info, 'LilyBot: Commands', '', 'all commands', ctx.bot.commands)
     
     async def _help_command(self, ctx: LilyBotContext, target_command: _utils.Command):
         """Gets the help message for one command."""
@@ -102,7 +97,7 @@ class General(Cog):
         usage: Union[str, None] = target_command.example_usage
         if usage:
             info.add_field(name='Usage', value=usage.format(prefix=ctx.prefix, name=ctx.invoked_with), inline=False)
-        info.set_footer(text='Dozer Help | {!r} command | Info'.format(target_command.qualified_name))
+        info.set_footer(text='LilyBot Help | {!r} command | Info'.format(target_command.qualified_name))
         await self._show_help(ctx, info, 'Subcommands: {prefix}{name} {signature}', '', '{name!r} command',
                               target_command.commands if isinstance(target_command, Group) else set(),
                               name=target_command.qualified_name, signature=target_command.signature)
@@ -119,7 +114,7 @@ class General(Cog):
                          footer: str, commands, **format_args):
         """Creates and sends a template help message, with arguments filled in."""
         format_args['prefix'] = ctx.prefix
-        footer = 'Dozer Help | {} | Page {}'.format(footer, '{page_num} of {len_pages}')
+        footer = 'LilyBot Help | {} | Page {}'.format(footer, '{page_num} of {len_pages}')
         # Page info is inserted as a parameter so page_num and len_pages aren't evaluated now
     
         if commands:
