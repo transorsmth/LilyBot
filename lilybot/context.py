@@ -1,12 +1,18 @@
 """Context for LilyBot message to clean messages before sending"""
+from typing import TYPE_CHECKING
+
 import discord
 from discord.ext import commands
 
 from lilybot import utils
 
+if TYPE_CHECKING:
+    from lilybot import LilyBot
+
 
 class LilyBotContext(commands.Context):
     """Cleans all messages before sending"""
+    bot: "LilyBot"
 
     async def send(self, content: str = None, **kwargs) -> discord.Message:  # pylint: disable=arguments-differ
         if content is not None:
