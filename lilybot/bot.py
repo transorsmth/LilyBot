@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import traceback
-from typing import Pattern, Optional, Union
+from typing import Pattern, Optional, Union, Generator
 
 import discord
 from discord.ext import commands
@@ -75,12 +75,14 @@ class LilyBot(commands.Bot):
             logger.warning("You are running an older version of the discord.py rewrite (with breaking changes)! "
                            "To upgrade, run `pip install -r requirements.txt --upgrade`")
 
-    async def get_context(self, message: discord.Message, *, cls=LilyBotContext):  # pylint: disable=arguments-differ
-        ctx = await super().get_context(message, cls=cls)
-        return ctx
-
-    async def get_command(self, name: str, /) -> Optional[Union[_utils.Command, _utils.Group]]:
+    def get_command(self, name: str) -> Optional[Union[_utils.Command, _utils.Group]]:  # pylint: disable=arguments-differ
         return super().get_command(name)
+
+    def walk_commands(self) -> Generator[Union[_utils.Command, _utils.Group], None, None]:
+        return super().walk_commands()
+
+    def get_cog(self, name: str, /) -> Optional[_utils.Cog]:
+        return super().get_cog(name)
 
     async def on_command_error(self, context: LilyBotContext, exception):  # pylint: disable=arguments-differ
         if isinstance(exception, commands.NoPrivateMessage):
