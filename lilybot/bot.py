@@ -135,6 +135,11 @@ class LilyBot(commands.Bot):
         traceback.print_exc()
         capture_exception()
 
+    async def get_context(self, message, *, cls=LilyBotContext) -> LilyBotContext:
+        ctx = await super().get_context(message, cls=cls)
+        ctx.prefix = self.dynamic_prefix.handler(self, message)[4]
+        return ctx
+
     @staticmethod
     def format_error(ctx: LilyBotContext, err: Exception, *, word_re: Pattern = re.compile('[A-Z][a-z]+')):
         """Turns an exception into a user-friendly (or -friendlier, at least) error message."""
