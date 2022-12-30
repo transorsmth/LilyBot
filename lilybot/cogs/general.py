@@ -38,7 +38,7 @@ class General(Cog):
     @command(name='help', aliases=['about'])
     @bot_has_permissions(add_reactions=True, embed_links=True,
                          read_message_history=True)  # Message history is for internals of paginate()
-    async def base_help(self, ctx: LilyBotContext, *, target: str = None):
+    async def base_help(self, ctx: LilyBotContext, *, target=None):
         """Show this message."""
         await ctx.defer()
         try:
@@ -52,71 +52,70 @@ class General(Cog):
             if target_name in ctx.bot.cogs:
                 await self._help_cog(ctx, ctx.bot.cogs[target_name])
             else:
-                target_command = ctx.bot.get_command(target_name)
-                if target_command is None:
+                command = ctx.bot.get_command(target_name)
+                if command is None:
                     raise BadArgument('that command/cog does not exist!')
                 else:
-                    await self._help_command(ctx, target_command)
+                    await self._help_command(ctx, command)
         else:  # Command with subcommand
-            target_command = ctx.bot.get_command(' '.join(target))
-            if target_command is None:
+            command = ctx.bot.get_command(' '.join(target))
+            if command is None:
                 raise BadArgument('that command does not exist!')
             else:
-                await self._help_command(ctx, target_command)
-    
+                await self._help_command(ctx, command)
+
     base_help.example_usage = """
-        `{prefix}help` - General help message
-        `{prefix}help help` - Help about the help command
-        `{prefix}help General` - Help about the General category
-        """
-    
+    `{prefix}help` - General help message
+    `{prefix}help help` - Help about the help command
+    `{prefix}help General` - Help about the General category
+    """
+
     async def _help_all(self, ctx: LilyBotContext):
         """Gets the help message for all commands."""
-        info: Embed = Embed(title='LilyBot: Info', description='A guild management bot for FIRST Discord servers',
-                            color=discord.Color.blue())
+        info = discord.Embed(title='LilyBot: Info', description='A guild management bot for FIRST Discord servers',
+                             color=discord.Color.blue())
         info.set_thumbnail(url=self.bot.user.avatar)
         info.add_field(name='About',
-                       value="LilyBot: A bot for all things Lily. ")
+                       value="LilyBot: IDK just LilyBot doing LilyBot things")
         info.add_field(name='About `{}{}`'.format(ctx.prefix, ctx.invoked_with), value=inspect.cleandoc("""
-            This command can show info for all commands, a specific command, or a category of commands.
-            Use `{0}{1} {1}` for more information.
-            """.format(ctx.prefix, ctx.invoked_with)), inline=False)
-    
+        This command can show info for all commands, a specific command, or a category of commands.
+        Use `{0}{1} {1}` for more information.
+        """.format(ctx.prefix, ctx.invoked_with)), inline=False)
+
         info.add_field(name="Open Source",
-                       value="LilyBot is open source! Feel free to view and contribute to our Python code "
-                             "[on Github](https://github.com/bcurbs/lilybot)", inline=False)
+                       value="Lilybot is open source! Feel free to view and contribute to our Python code "
+                             "[on Github](https://github.com/BCurbs/LilyBot/)", inline=False)
         info.set_footer(text='LilyBot Help | all commands | Info page')
         await self._show_help(ctx, info, 'LilyBot: Commands', '', 'all commands', ctx.bot.commands)
-    
-    async def _help_command(self, ctx: LilyBotContext, target_command: _utils.Command):
+
+    async def _help_command(self, ctx: LilyBotContext, command):
         """Gets the help message for one command."""
-        info: Embed = Embed(title='Command: {}{} {}'.format(ctx.prefix, target_command.qualified_name, target_command.signature),
-                            description=target_command.help or (
-                                None if target_command.example_usage else 'No information provided.'),
-                            color=discord.Color.blue())
-        usage: Union[str, None] = target_command.example_usage
+        info = discord.Embed(title='Command: {}{} {}'.format(ctx.prefix, command.qualified_name, command.signature),
+                             description=command.help or (
+                                 None if command.example_usage else 'No information provided.'),
+                             color=discord.Color.blue())
+        usage = command.example_usage
         if usage:
             info.add_field(name='Usage', value=usage.format(prefix=ctx.prefix, name=ctx.invoked_with), inline=False)
-        info.set_footer(text='LilyBot Help | {!r} command | Info'.format(target_command.qualified_name))
+        info.set_footer(text='LilyBot Help | {!r} command | Info'.format(command.qualified_name))
         await self._show_help(ctx, info, 'Subcommands: {prefix}{name} {signature}', '', '{name!r} command',
-                              target_command.commands if isinstance(target_command, Group) else set(),
-                              name=target_command.qualified_name, signature=target_command.signature)
-    
-    async def _help_cog(self, ctx: LilyBotContext, cog: Cog):
+                              command.commands if isinstance(command, Group) else set(),
+                              name=command.qualified_name, signature=command.signature)
+
+    async def _help_cog(self, ctx: LilyBotContext, cog):
         """Gets the help message for one cog."""
         await self._show_help(ctx, None, 'Category: {cog_name}', inspect.cleandoc(cog.__doc__ or ''),
                               '{cog_name!r} category',
-                              (target_command for target_command in ctx.bot.commands if target_command.cog is cog),
+                              (command for command in ctx.bot.commands if command.cog is cog),
                               cog_name=type(cog).__name__)
-    
-    @staticmethod
-    async def _show_help(ctx: LilyBotContext, start_page: Optional[Embed], title: str, description: str,
+
+    async def _show_help(self, ctx: LilyBotContext, start_page: discord.Embed, title: str, description: str,
                          footer: str, commands, **format_args):
         """Creates and sends a template help message, with arguments filled in."""
         format_args['prefix'] = ctx.prefix
         footer = 'LilyBot Help | {} | Page {}'.format(footer, '{page_num} of {len_pages}')
         # Page info is inserted as a parameter so page_num and len_pages aren't evaluated now
-    
+
         if commands:
             filtered_commands = []
             for sort_command in commands:
@@ -130,47 +129,45 @@ class General(Cog):
             pages = []
             for page_num, page_commands in enumerate(command_chunks):
                 format_args['page_num'] = page_num + 1
-                page: Embed = Embed(title=title.format(**format_args), description=description.format(**format_args),
-                                    color=discord.Color.blue())
-                for target_command in page_commands:
-                    if target_command.short_doc:
-                        embed_value = target_command.short_doc
-                    elif target_command.example_usage:  # Usage provided - show the user the command to see it
+                page = discord.Embed(title=title.format(**format_args), description=description.format(**format_args),
+                                     color=discord.Color.blue())
+                for command in page_commands:
+                    if command.short_doc:
+                        embed_value = command.short_doc
+                    elif command.example_usage:  # Usage provided - show the user the command to see it
                         embed_value = 'Use `{0.prefix}{0.invoked_with} {1.qualified_name}` for more information.'.format(
-                            ctx, target_command)
+                            ctx, command)
                     else:
                         embed_value = 'No information provided.'
-                    page.add_field(name='{}{} {}'.format(ctx.prefix, target_command.qualified_name, target_command.signature),
+                    page.add_field(name='{}{} {}'.format(ctx.prefix, command.qualified_name, command.signature),
                                    value=embed_value, inline=False)
                 page.set_footer(text=footer.format(**format_args))
                 pages.append(page)
-    
+
             if start_page is not None:
                 pages.append({'info': start_page})
-    
+
             if len(pages) == 1:
                 await ctx.send(embed=pages[0])
             elif start_page is not None:
                 info_emoji = '\N{INFORMATION SOURCE}'
                 p = Paginator(ctx, (info_emoji, ...), pages, start='info',
-                              auto_remove=ctx.channel.permissions_for(ctx.me).manage_messages)
+                              auto_remove=ctx.channel.permissions_for(ctx.me))
                 async for reaction in p:
                     if reaction == info_emoji:
                         p.go_to_page('info')
             else:
-                await paginate(ctx, pages, auto_remove=ctx.channel.permissions_for(ctx.me).manage_messages)
+                await paginate(ctx, pages, auto_remove=ctx.channel.permissions_for(ctx.me))
         elif start_page:  # No commands - command without subcommands or empty cog - but a usable info page
             await ctx.send(embed=start_page)
-        else:  # No commands and no info page
+        else:  # No commands, and no info page
             format_args['len_pages'] = 1
             format_args['page_num'] = 1
-            embed: Embed = Embed(
-                title=title.format(**format_args),
-                description=description.format(**format_args),
-                color=discord.Color.blue())
+            embed = discord.Embed(title=title.format(**format_args), description=description.format(**format_args),
+                                  color=discord.Color.blue())
             embed.set_footer(text=footer.format(**format_args))
             await ctx.send(embed=embed)
-    
+
     @has_permissions(change_nickname=True)
     @command()
     async def nick(self, ctx: LilyBotContext, *, nicktochangeto: str):
