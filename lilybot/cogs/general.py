@@ -127,7 +127,7 @@ class General(Cog):
                     continue
             command_chunks = list(chunk(sorted(filtered_commands, key=lambda cmd: cmd.name), 4))
             format_args['len_pages'] = len(command_chunks)
-            pages: List[Union[Embed, Dict[str, Embed]]] = []
+            pages = []
             for page_num, page_commands in enumerate(command_chunks):
                 format_args['page_num'] = page_num + 1
                 page: Embed = Embed(title=title.format(**format_args), description=description.format(**format_args),
