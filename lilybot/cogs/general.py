@@ -72,7 +72,7 @@ class General(Cog):
 
     async def _help_all(self, ctx: LilyBotContext):
         """Gets the help message for all commands."""
-        info = discord.Embed(title='LilyBot: Info', description='A guild management bot for FIRST Discord servers',
+        info = discord.Embed(title='LilyBot: Info', description='IDK just LilyBot doing LilyBot things',
                              color=discord.Color.blue())
         info.set_thumbnail(url=self.bot.user.avatar)
         info.add_field(name='About',
