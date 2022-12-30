@@ -476,7 +476,7 @@ class Chat(Cog):
 
     async def should_respond_message(self, message, author, channel, prefix):
         """Checks if the bot should respond to that specific message."""
-        if message.content.lower().startswith(prefix):
+        if message.content.lower().startswith(prefix[2]):
             return False
         if author.banned is True:
             await message.reply('You have been banned from the chatbot for the safety of our users. ',

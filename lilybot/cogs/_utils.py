@@ -22,8 +22,6 @@ __all__ = ['bot_has_permissions', 'command', 'group', 'Cog', 'Reactor', 'Paginat
            'DynamicPrefixEntry', 'CommandMixin']
 
 
-
-
 class CommandMixin:
     """Example usage processing"""
 
@@ -169,10 +167,8 @@ class Reactor:
         self._remove_reactions = auto_remove and ctx.channel.permissions_for(
             self.me).manage_messages  # Check for required permissions
         self.timeout = timeout
-        self._action: Optional[Coroutine] = None
+        self._action = None
         self.message = None
-        self.pages: Dict[Union[int, str], Embed]
-        self.page: Embed
 
     async def __aiter__(self):
         self.message = await self.dest.send(embed=self.pages[self.page])
@@ -239,22 +235,21 @@ class Paginator(Reactor):
         '\N{BLACK SQUARE FOR STOP}'  # :stop_button:
     )
 
-    def __init__(self, ctx: LilyBotContext, initial_reactions: Iterable[discord.Reaction], pages: List[Union[Embed, Dict[str, Embed]]], *,
-                 start: Union[int, str] = 0, auto_remove: bool = True, timeout: int = 60):
+    def __init__(self, ctx: LilyBotContext, initial_reactions, pages, *, start: int = 0, auto_remove: bool = True,
+                 timeout: int = 60):
         all_reactions = list(initial_reactions)
-        ind: int = all_reactions.index(Ellipsis)
+        ind = all_reactions.index(Ellipsis)
         all_reactions[ind:ind + 1] = self.pagination_reactions
         super().__init__(ctx, all_reactions, auto_remove=auto_remove, timeout=timeout)
         if pages and isinstance(pages[-1], Mapping):
-            named_pages: Dict[str, Embed] = pages.pop()
-            # The following code assembles the list of Embeds into a dict with the indexes as keys, and with the named pages.
-            self.pages = {**{k: v for v, k in enumerate(pages)}, **named_pages}
+            named_pages = pages.pop()
+            self.pages = dict(enumerate(pages), **named_pages)
         else:
             self.pages = pages
-        self.len_pages: int = len(pages)
-        self.page: Union[int, str] = start
-        self.message: Optional[discord.Message] = None
-        self.reactor: Optional[AsyncGenerator] = None
+        self.len_pages = len(pages)
+        self.page = start
+        self.message = None
+        self.reactor = None
 
     async def __aiter__(self):
         self.reactor = super().__aiter__()
@@ -309,13 +304,13 @@ async def paginate(ctx: LilyBotContext, pages, *, start: int = 0, auto_remove: b
         pass  # The normal pagination reactions are handled - just drop anything else
 
 
-def chunk(iterable, size: int) -> Iterable[Iterable]:
+def chunk(iterable, size: int):
     """
     Break an iterable into chunks of a fixed size. Returns an iterable of iterables.
     Almost-inverse of itertools.chain.from_iterable - passing the output of this into that function will reconstruct the original iterable.
     If the last chunk is not the full length, it will be returned but not padded.
     """
-    contents: List = list(iterable)
+    contents = list(iterable)
     for i in range(0, len(contents), size):
         yield contents[i:i + size]
 
