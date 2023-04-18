@@ -693,7 +693,10 @@ class Roles(Cog):
    -----To target a custom message use this format-----
     `{prefix}rolemenu addrole <channel> <message id> <@robots or "Robots"> 🤖`
     """
-
+    @rolemenu.command()
+    @has_permissions(manage_roles=True)
+    async def emojitest(self, ctx: LilyBotContext, emoji: discord.Emoji):
+        await ctx.reply(str(emoji.id))
     @rolemenu.command(aliases=['update'])
     @bot_has_permissions(manage_roles=True, embed_links=True)
     @has_permissions(manage_roles=True)
