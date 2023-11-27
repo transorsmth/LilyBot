@@ -32,7 +32,7 @@ class Chat(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self._loop = bot.loop
-        self.db_url = bot.config['db_url']
+        self.chatbot_url = bot.config['chatbot_url']
         self.session = aiohttp.ClientSession(loop=bot.loop)
 
         self.chatbot_object = ChatBot(
@@ -41,7 +41,7 @@ class Chat(Cog):
             logic_adapters=[
                 'chatterbot.logic.BestMatch'
             ],
-            database_uri=self.db_url
+            database_uri=self.chatbot_url
         )
         self.trainer = ListTrainer(self.chatbot_object)
         self._channel_cache = {}
