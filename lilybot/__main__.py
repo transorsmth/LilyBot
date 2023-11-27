@@ -12,6 +12,7 @@ config = {
     'prefix': '&', 'developers': [],
     'cache_size': 20000,
     'db_url': 'postgres://LilyBot_user:simplepass@postgres_ip',
+    'chatbot_url': 'postgres://dozer_user:simplepass@postgres_ip',
     'discord_token': "Put Discord API Token here.",
     'news': {
         'check_interval': 5.0,
