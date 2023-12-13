@@ -643,7 +643,7 @@ class Roles(Cog):
     @guild_only()
     async def addrole(self, ctx: LilyBotContext, channel: typing.Optional[discord.TextChannel], message_id: int,
                       role: discord.Role,
-                      emoji: typing.Union[discord.Emoji, str]):
+                      emoji: str):
         """Adds a reaction role to a message or a role menu"""
         if isinstance(emoji, discord.Emoji) and emoji.guild_id != ctx.guild.id:
             raise BadArgument(f"The emoji {emoji} is a custom emoji not from this server!")
