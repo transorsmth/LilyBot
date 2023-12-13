@@ -20,8 +20,6 @@ if typing.TYPE_CHECKING:
 blurple = discord.Color.blurple()
 
 
-
-
 class Roles(Cog):
     """Commands for role management."""
 
@@ -673,8 +671,8 @@ class Roles(Cog):
         )
 
         old_reaction = await ReactionRole.get_by(message_id=message.id, role_id=role.id)
-        if len(old_reaction):
-            await self.del_from_message(message, old_reaction[0])
+        # if len(old_reaction):
+        #     await self.del_from_message(message, old_reaction[0])
         await self.add_to_message(message, reaction_role)
 
         if menu:
@@ -693,10 +691,12 @@ class Roles(Cog):
    -----To target a custom message use this format-----
     `{prefix}rolemenu addrole <channel> <message id> <@robots or "Robots"> 🤖`
     """
+
     @rolemenu.command()
     @has_permissions(manage_roles=True)
     async def emojitest(self, ctx: LilyBotContext, emoji: discord.Emoji):
         await ctx.reply(str(emoji.id))
+
     @rolemenu.command(aliases=['update'])
     @bot_has_permissions(manage_roles=True, embed_links=True)
     @has_permissions(manage_roles=True)
