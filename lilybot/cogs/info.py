@@ -13,13 +13,9 @@ from discord.utils import escape_markdown
 from lilybot.context import LilyBotContext
 from ._utils import *
 from .levels import MemberXP, GuildXPSettings
-from ..components.ChatbotChannel import ChatbotChannel
-from ..components.ChatbotUser import ChatbotUser
 
 blurple = discord.Color.blurple()
 datetime_format = '%Y-%m-%d %H:%M:%S\nUTC'
-
-
 
 
 class Info(Cog):
@@ -76,9 +72,7 @@ class Info(Cog):
             embed.add_field(name='Status and Activity', value=f'{status}\n{activities}', inline=False)
         for field_number, roles in enumerate(chunk(member.roles[:0:-1], 35)):
             embed.add_field(name='Roles', value=', '.join(role.mention for role in roles) or 'None', inline=False)
-        user_data = await ChatbotUser.get_user(user_id=member.id)
-        embed.add_field(name='Total responded messages: ',
-                        value=str(user_data.messages if user_data is not None else 0))
+
         footers.append(f"Color: {str(member.color).upper()}")
         embed.set_footer(text="; ".join(footers))
         await ctx.send(embed=embed)
@@ -177,31 +171,7 @@ class Info(Cog):
         embed.add_field(name='Emoji', value="{} static, {} animated".format(static_emoji, animated_emoji))
         embed.add_field(name='Roles', value=str(len(guild.roles) - 1))  # Remove @everyone
         embed.add_field(name='Channels', value=str(len(guild.channels)))
-        results = await ChatbotChannel.get_by(guild_id=guild.id)
-        if results:
-            channels = ''
-            train_channels = ''
-            total_messages = 0
-            total_trained = 0
-            for result in results:
-                total_messages += result.messages
-                total_trained += result.trained_messages
-                try:
-                    if result.train_in:
-                        train_channels += ' <#{}>'.format(result.channel_id)
-                    if result.respond_in:
-                        channels += ' <#{}>'.format(result.channel_id)
-                except discord.NotFound:
-                    logger.debug("Ignoring channel does not exist, and not adding channel to list. ")
-            if channels == "":
-                channels = "The bot does not respond in any channels."
-            if train_channels == "":
-                train_channels = "The bot does not learn in any channels. "
-            embed.add_field(name='Pluralkit compatibility: ', value='Enabled')
-            embed.add_field(name='Channels to respond in: ', value=channels)
-            embed.add_field(name='Channels to train in: ', value=train_channels)
-            embed.add_field(name='Total messages responded to: ', value=str(total_messages))
-            embed.add_field(name='Total trained messages: ', value=str(total_trained))
+
         embed.add_field(name='Nitro Boost Info', value=f'Level {ctx.guild.premium_tier}, '
                                                        f'{ctx.guild.premium_subscription_count} booster(s), '
                                                        f'{ctx.guild.filesize_limit // 1024 ** 2}MiB files, '
@@ -212,33 +182,6 @@ class Info(Cog):
     guild.example_usage = """
     `{prefix}guild` - get information about this guild
     """
-
-    @command(name='channel')
-    @guild_only()
-    async def guildchannelgetter(self, ctx, *, channel: discord.TextChannel = None):
-        """Get information about the channel. """
-        if channel is None:
-            channel = ctx.channel
-        channel_data = await ChatbotChannel.get_channel(channel_id=channel.id)
-        if channel_data is not None:
-            embed = discord.Embed(
-                title=channel.name, description=f'{channel.name}, ({channel.id})')
-            embed.add_field(name='Total responded messages: ',
-                            value=str(channel_data.messages))
-            embed.add_field(name='Total trained messages: ',
-                            value=str(channel_data.trained_messages))
-            embed.add_field(name='Will respond in: ',
-                            value=str(channel_data.respond_in))
-            embed.add_field(name='Will train in: ',
-                            value=str(channel_data.train_in))
-        else:
-            embed = discord.Embed(
-                title=channel.name, description=f'{channel.name}, ({channel.id})')
-            embed.add_field(name='Total responded messages: ', value=str(0))
-            embed.add_field(name='Total trained messages: ', value=str(0))
-            embed.add_field(name='Will respond in: ', value=str('False'))
-            embed.add_field(name='Will train in: ', value=str('False'))
-        await ctx.send(embed=embed)
 
 
 async def setup(bot):
