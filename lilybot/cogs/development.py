@@ -14,10 +14,6 @@ class Development(Cog):
     Commands useful for developing the bot.
     These commands are restricted to bot developers.
     """
-    eval_globals = {}
-    for module in ('asyncio', 'collections', 'discord', 'inspect', 'itertools'):
-        eval_globals[module] = __import__(module)
-    eval_globals['__builtins__'] = __import__('builtins')
 
     def cog_check(self, ctx: LilyBotContext):  # All of this cog is only available to devs
         if ctx.author.id not in ctx.bot.config['developers']:
