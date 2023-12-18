@@ -18,8 +18,6 @@ from ._utils import *
 from .general import blurple
 from .. import db
 
-
-
 TIMEZONE_FILE = "timezones.json"
 
 
@@ -73,7 +71,7 @@ class Management(Cog):
         channel = guild.get_channel(db_entry.channel_id if not channel_override else channel_override)
         if not channel:
             logger.warning(f"Attempted to schedulesend message in guild({guild}), channel({db_entry.channel_id});"
-                                f" Channel no longer exist")
+                           f" Channel no longer exist")
             return
         embed.colour = blurple
         perms = channel.permissions_for(guild.me)
@@ -84,7 +82,7 @@ class Management(Cog):
             await channel.send(embed=embed)
         else:
             logger.warning((f"Attempted to schedulesend message in guild({guild}:{guild.id}), channel({channel});"
-                                 f" Client lacks send permissions"))
+                            f" Client lacks send permissions"))
 
     @group(invoke_without_command=True)
     @has_permissions(manage_messages=True)

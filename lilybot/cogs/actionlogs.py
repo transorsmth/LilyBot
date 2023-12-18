@@ -16,9 +16,9 @@ from .general import blurple
 from .moderation import GuildNewMember
 from .. import db
 from ..components.CustomJoinLeaveMessages import CustomJoinLeaveMessages, format_join_leave, send_log
+
 if TYPE_CHECKING:
     from lilybot import LilyBot
-
 
 
 async def embed_paginatorinator(content_name, embed, text):
