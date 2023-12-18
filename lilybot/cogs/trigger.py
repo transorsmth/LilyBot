@@ -13,6 +13,10 @@ from ..components import detect_keysmash
 class Trigger(Cog):
     """Manages triggers similar to carl bot"""
 
+    def __init__(self, bot: "LilyBot"):
+        super().__init__(bot)
+        self.choice = 0
+
     @Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
@@ -36,8 +40,13 @@ class Trigger(Cog):
                 # nsfw category ID:
                 if message.channel.category_id == 983817576616460328:
                     choices.extend(nsfw_choices)
+
+                choice = random.randint(0, len(choices))
+                while self.choice == choice:
+                    choice = random.randint(0, len(choices))
+                self.choice = choice
                 await asyncio.sleep(0.2)
-                await message.channel.send(random.choice(choices))
+                await message.channel.send(choices[self.choice % len(choices)])
 
     @group(name="trigger", aliases=["triggers"], invoke_without_command=True)
     @has_permissions(manage_messages=True)
