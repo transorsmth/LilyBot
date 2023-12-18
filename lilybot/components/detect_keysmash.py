@@ -82,7 +82,7 @@ def is_mashing(text: str, cutoff=1.75):
 
 
 def is_keysmash(text):
-    if len(find_longest_word(text)) <= 11 and not (len(text) >= 11 and text.count(' ') == 0):
+    if len(find_longest_word(text)) <= 9 and not (len(text) >= 9 and text.count(' ') == 0):
         return False
     if text.count(' ') > 2:
         return False
