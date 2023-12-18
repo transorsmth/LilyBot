@@ -45,7 +45,7 @@ class Trigger(Cog):
                 while self.choice == choice:
                     choice = random.randint(0, len(choices))
                 self.choice = choice
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(0.4)
                 await message.channel.send(choices[self.choice % len(choices)])
 
     @group(name="trigger", aliases=["triggers"], invoke_without_command=True)
