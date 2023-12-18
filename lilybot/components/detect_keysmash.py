@@ -81,8 +81,6 @@ def is_mashing(text: str, cutoff=1.75):
 
 
 def is_keysmash(text):
-    print()
-    print(text)
     if len(find_longest_word(text)) < 10 and not (len(text) > 10 and text.count(' ') == 0):
         return False
     if text.count(' ') > 2:
@@ -98,7 +96,6 @@ def is_keysmash(text):
     for value in letters.values():
         if value >= list(top_letters.values())[-1]:
             a += value
-    print(f"{len(text) / len(get_letters(text))}")
 
     # print(a / len(text))
     # # print(top_letters)
