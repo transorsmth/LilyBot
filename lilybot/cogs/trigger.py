@@ -29,6 +29,7 @@ class Trigger(Cog):
 
         if message.guild.id == 983814962822660176:
             print("Correct guild")
+            print(detect_keysmash.score_not_mashing(message.content))
             print(detect_keysmash.is_mashing(message.content))
             print(message.guild.get_role(
                     983824647856472154) in message.author.roles)
