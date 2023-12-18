@@ -31,9 +31,9 @@ class Trigger(Cog):
             if detect_keysmash.is_keysmash(message.content) and message.guild.get_role(
                     983824647856472154) in message.author.roles:
                 choices = ["good girl", 'cutie', 'sweetheart']
+                nsfw_choices = ['good bottom']
                 # nsfw category ID:
                 if message.channel.category_id == 983817576616460328:
-                    print('AAAAAAAAAAAA')
                     choices.append('good bottom')
                 await asyncio.sleep(0.2)
                 await message.channel.send(random.choice(choices))

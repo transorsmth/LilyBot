@@ -1,6 +1,7 @@
 # https://gist.github.com/bryanhelmig/2cc72b92e5d3c6afd71ed86c8247a4f8
 import itertools
 import math
+import re
 from operator import itemgetter
 
 
@@ -96,6 +97,9 @@ def is_keysmash(text):
     for value in letters.values():
         if value >= list(top_letters.values())[-1]:
             a += value
+    topkey = list(top_letters.keys())[0]
+    if max(len(x) for x in re.findall(r'[%s]+' % topkey, text)) > len(text)/2:
+        return False
 
     # print(a / len(text))
     # # print(top_letters)
