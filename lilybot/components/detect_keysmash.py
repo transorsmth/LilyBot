@@ -94,9 +94,15 @@ def is_keysmash(text):
     letters = get_letters(text)
     top_letters = dict(sorted(letters.items(), key=itemgetter(1), reverse=True)[:4])
     a = 0
-    for value in letters.values():
-        if value >= list(top_letters.values())[-1]:
-            a += value
+
+    if list(top_letters.values())[-1] > 3:
+
+        for value in letters.values():
+            if value >= list(top_letters.values())[-1]:
+                a += value
+    else:
+        a = sum([value for value in top_letters.values()])
+
     topkey = list(top_letters.keys())[0]
     if max(len(x) for x in re.findall(r'[%s]+' % topkey, text)) > len(text)/2:
         return False
