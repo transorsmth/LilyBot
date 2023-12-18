@@ -1,2 +1,2 @@
 #!/bin/bash
-env/bin/python -m lilybot
+venv/bin/python -m lilybot
