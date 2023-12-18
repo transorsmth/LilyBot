@@ -14,3 +14,5 @@ aiohttp==3.8.1
 humanize~=3.8.0
 lavaplayer
 loguru>=0.6.0
+discord.py>=2.3.2
+git+https://github.com/feignbird/ChatterBot-spacy_fixed.git

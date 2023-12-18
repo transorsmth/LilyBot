@@ -6,6 +6,7 @@ from discord.ext.commands import has_permissions, guild_only
 
 from ._utils import *
 from .. import db
+from ..components import detect_keysmash
 
 
 class Trigger(Cog):
@@ -23,6 +24,11 @@ class Trigger(Cog):
                     await message.channel.send(embed=discord.Embed(title=trigger.response))
                 else:
                     await message.channel.send(trigger.response)
+        else:
+            if message.guild.id == 983814962822660176:
+                if detect_keysmash.is_mashing(message.content) and await message.guild.fetch_role(
+                        983824647856472154) in message.author.roles:
+                    await message.channel.send("good girl")
 
     @group(name="trigger", aliases=["triggers"], invoke_without_command=True)
     @has_permissions(manage_messages=True)
@@ -50,6 +56,7 @@ class Trigger(Cog):
                 embed.add_field(name="Triggers", value=filter_text)
             embed.colour = discord.Color.dark_orange()
             await ctx.send(embed=embed)
+
     trigger_group.example_usage = """
     `{prefix}trigger` - Lists all the triggers in the current server
     `{prefix}trigger add hello hi! how are you?` - adds the response "hi! how are you?" for the trigger "hello"
