@@ -22,13 +22,19 @@ class Trigger(Cog):
                 await asyncio.sleep(0.5)
                 if trigger.embed:
                     await message.channel.send(embed=discord.Embed(title=trigger.response))
+                    return
                 else:
                     await message.channel.send(trigger.response)
-        else:
-            if message.guild.id == 983814962822660176:
-                if detect_keysmash.is_mashing(message.content) and await message.guild.fetch_role(
-                        983824647856472154) in message.author.roles:
-                    await message.channel.send("good girl")
+                    return
+
+        if message.guild.id == 983814962822660176:
+            print("Correct guild")
+            print(detect_keysmash.is_mashing(message.content))
+            print(await message.guild.fetch_role(
+                    983824647856472154) in message.author.roles)
+            if detect_keysmash.is_mashing(message.content) and await message.guild.fetch_role(
+                    983824647856472154) in message.author.roles:
+                await message.channel.send("good girl")
 
     @group(name="trigger", aliases=["triggers"], invoke_without_command=True)
     @has_permissions(manage_messages=True)
