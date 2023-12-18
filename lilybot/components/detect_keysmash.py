@@ -1,6 +1,7 @@
 # https://gist.github.com/bryanhelmig/2cc72b92e5d3c6afd71ed86c8247a4f8
 import itertools
 import math
+from operator import itemgetter
 
 
 def tokenize_keyboard(board):
@@ -50,13 +51,73 @@ def pairwise(iterable):
     return zip(a, b)
 
 
+def find_longest_word(word_list):
+    longest_word = max(word_list, key=len)
+    return longest_word
+
+
+def get_letters(string):
+    all_freq = {}
+
+    for i in string:
+        if i in all_freq:
+            all_freq[i] += 1
+        else:
+            all_freq[i] = 1
+    return all_freq
+
+
 def score_not_mashing(text):
     "Returns a float - higher score is less likely to be mashing."
     distance = 0.0
     for a, b in pairwise(text):
         distance += (get_distance(a, b) - 1)
+
     return distance / len(text)
 
 
-def is_mashing(text, cutoff=1.75):
+def is_mashing(text: str, cutoff=1.75):
     return score_not_mashing(text) < cutoff
+
+
+def is_keysmash(text):
+    print()
+    print(text)
+    if len(find_longest_word(text)) < 10 and not (len(text) > 10 and text.count(' ') == 0):
+        return False
+    if text.count(' ') > 2:
+        return False
+    # if not (text.upper() == text or text.lower() == text):
+    #     return False
+    punc = set('/\\\'";:.,><?|()*&^%$#@!')
+    if any((c in text) for c in punc):
+        return False
+    letters = get_letters(text)
+    top_letters = dict(sorted(letters.items(), key=itemgetter(1), reverse=True)[:4])
+    a = 0
+    for value in letters.values():
+        if value >= list(top_letters.values())[-1]:
+            a += value
+    print(f"{len(text) / len(get_letters(text))}")
+
+    # print(a / len(text))
+    # # print(top_letters)
+    # return len(text)/len(get_letters(text)) > 2.5
+    return a / len(text) > 0.7
+    # if a/len(text) > 0.7:
+    #     return True
+    # if sum(top_letters.values()) > len(text) / 2:
+    #     return True
+    # return False
+
+
+if __name__ == '__main__':
+    print(is_keysmash("iadwhoiadwiodawihdaowdahiwo"))
+    print(is_keysmash("wdahiaulhlifwahiowfhioawhfil"))
+    print(is_keysmash('Cnjdjdjdjjdjdjsjskss'))
+    print(is_keysmash('ioawdioawjioawdjawdjiodioaw'))
+    print(is_keysmash('Jdjdjsjsjsskkdkd'))
+    print(is_keysmash('Jdjsjsjdjsj'))
+    print(is_keysmash('spspspsp'))
+    print(is_keysmash("hey im ava"))
+    print(is_keysmash("antidisestablishmentarianism"))
