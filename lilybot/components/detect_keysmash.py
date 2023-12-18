@@ -104,7 +104,7 @@ def is_keysmash(text):
         a = sum([value for value in top_letters.values()])
 
     topkey = list(top_letters.keys())[0]
-    if max(len(x) for x in re.findall(r'[%s]+' % topkey, text)) > len(text)/2:
+    if max(len(x) for x in re.findall(r'[%s]+' % topkey, text)) > top_letters[topkey]*(2/3):
         return False
 
     # print(a / len(text))
