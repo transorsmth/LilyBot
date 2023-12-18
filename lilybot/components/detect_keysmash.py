@@ -109,7 +109,7 @@ def is_keysmash(text):
 
 
 if __name__ == '__main__':
-    print(is_keysmash("iadwhoiadwiodawihdaowdahiwo"))
+    print(is_keysmash("ndndjejdndnrnendn"))
     print(is_keysmash("wdahiaulhlifwahiowfhioawhfil"))
     print(is_keysmash('Cnjdjdjdjjdjdjsjskss'))
     print(is_keysmash('ioawdioawjioawdjawdjiodioaw'))

@@ -1,4 +1,5 @@
 import asyncio
+import random
 import re
 
 import discord
@@ -26,11 +27,15 @@ class Trigger(Cog):
                 else:
                     await message.channel.send(trigger.response)
                     return
-
         if message.guild.id == 983814962822660176:
             if detect_keysmash.is_keysmash(message.content) and message.guild.get_role(
                     983824647856472154) in message.author.roles:
-                await message.channel.send("good girl")
+                choices = ["good girl", 'cutie', 'sweetheart']
+                # nsfw category ID:
+                if message.channel.category_id == 983817576616460328:
+                    choices.append('good bottom')
+                await asyncio.sleep(0.2)
+                await message.channel.send(random.choice(choices))
 
     @group(name="trigger", aliases=["triggers"], invoke_without_command=True)
     @has_permissions(manage_messages=True)
