@@ -33,6 +33,7 @@ class Trigger(Cog):
                 choices = ["good girl", 'cutie', 'sweetheart']
                 # nsfw category ID:
                 if message.channel.category_id == 983817576616460328:
+                    print('AAAAAAAAAAAA')
                     choices.append('good bottom')
                 await asyncio.sleep(0.2)
                 await message.channel.send(random.choice(choices))
