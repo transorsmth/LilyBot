@@ -85,15 +85,15 @@ ignorefilter = ['mississippi', 'triggering', 'interesting']
 
 
 def is_keysmash(text):
-    print(text)
+    # print(text)
     if len(find_longest_word(text)) <= 9 and not (len(text) >= 9 and text.count(' ') == 0):
-        print('no for length')
+        # print('no for length')
         return False
     if any(word in text for word in ignorefilter):
-        print('no for ignorefilter')
+        # print('no for ignorefilter')
         return False
     if text.count(' ') > 2:
-        print('no for spaces')
+        # print('no for spaces')
         return False
     # if not (text.upper() == text or text.lower() == text):
     #     return False
@@ -115,8 +115,8 @@ def is_keysmash(text):
     topkey = list(top_letters.keys())[0]
     if max(len(x) for x in re.findall(r'[%s]+' % topkey, text)) > top_letters[topkey] * (2 / 3):
         return False
-    print(a / len(text))
-    print(top_letters)
+    # print(a / len(text))
+    # print(top_letters)
     # return len(text)/len(get_letters(text)) > 2.5
     return a / len(text) > 0.62
     # if a/len(text) > 0.7:
