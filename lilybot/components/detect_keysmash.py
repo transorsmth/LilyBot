@@ -101,7 +101,7 @@ def is_keysmash(text):
     if any((c in text) for c in punc):
         return False
     letters = get_letters(text)
-    top_letters = dict(sorted(letters.items(), key=itemgetter(1), reverse=True)[:4])
+    top_letters = dict(sorted(letters.items(), key=itemgetter(1), reverse=True)[:5])
     a = 0
 
     if list(top_letters.values())[-1] > 3:
@@ -118,7 +118,7 @@ def is_keysmash(text):
     # print(a / len(text))
     # print(top_letters)
     # return len(text)/len(get_letters(text)) > 2.5
-    return a / len(text) > 0.62
+    return a / len(text) > 0.68
     # if a/len(text) > 0.7:
     #     return True
     # if sum(top_letters.values()) > len(text) / 2:
@@ -127,6 +127,7 @@ def is_keysmash(text):
 
 
 if __name__ == '__main__':
+    print(is_keysmash('Bahsjrjdsnbsbdkdjdlehhb'))
     print(is_keysmash('Qvdjhankqkdhabdk'))
     print(is_keysmash("ndndjejdndnrnendn"))
     print(is_keysmash("wdahiaulhlifwahiowfhioawhfil"))
