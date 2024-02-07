@@ -18,7 +18,7 @@ class Trigger(Cog):
         self.choice = 0
 
     @Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
         results = await TriggerResponseRecords.get_by(guild_id=message.guild.id)
@@ -34,7 +34,7 @@ class Trigger(Cog):
         if message.guild.id == 983814962822660176:
             if detect_keysmash.is_keysmash(message.content) and message.guild.get_role(
                     983824647856472154) in message.author.roles:
-                choices = ["good girl", 'cutie', 'sweetheart']
+                choices = ["good girl", 'cutie', 'sweetheart', 'secure password detected']
 
                 nsfw_choices = ['good bottom', ';)', 'hottie', 'adorable']
                 # nsfw category ID:
@@ -45,8 +45,10 @@ class Trigger(Cog):
                 while self.choice == choice:
                     choice = random.randint(0, len(choices))
                 self.choice = choice
-                await asyncio.sleep(0.4)
-                await message.channel.send(choices[self.choice % len(choices)])
+                ctx = await self.bot.get_context(message)
+                async with ctx.typing():
+                    await asyncio.sleep(0.4)
+                    await message.channel.send(choices[self.choice % len(choices)])
 
     @group(name="trigger", aliases=["triggers"], invoke_without_command=True)
     @has_permissions(manage_messages=True)
