@@ -626,7 +626,9 @@ class Moderation(Cog):
         """Lock a channel to @everyone so they can't send messages"""
         msg = await ctx.reply("Locking.")
         await channel_mention.send(f"This channel has been locked by {ctx.author.mention}. \n Reason: {reason}")
-        await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
+        await channel_mention.set_permissions(ctx.guild.default_role, send_messages=False)
+        await channel_mention.edit(name=channel_mention.name+"-locked")
+        await ctx.message.delete(delay=5)
         await msg.delete(delay=5)
 
     @command()
@@ -634,8 +636,12 @@ class Moderation(Cog):
     @bot_has_permissions(manage_channels=True)
     async def unlock(self, ctx: LilyBotContext, channel_mention: discord.TextChannel):
         """Unlock a channel"""
-        await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
+        await channel_mention.set_permissions(ctx.guild.default_role, send_messages=True)
+        if channel_mention.name.endswith('-locked'):
+            await channel_mention.edit(name=channel_mention.name.removesuffix('-locked'))
+
         msg = await ctx.reply("Unlocked.")
+        await ctx.message.delete(delay=5)
         await msg.delete(delay=5)
 
     @command()
