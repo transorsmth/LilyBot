@@ -639,9 +639,7 @@ class Moderation(Cog):
     async def unlock(self, ctx: LilyBotContext, channel_mention: discord.TextChannel):
         """Unlock a channel"""
 
-        overwrites = channel_mention.overwrites_for(ctx.guild.default_role)
-        overwrites.update(send_messages=True)
-        await channel_mention.set_permissions(ctx.guild.default_role, overwrite=overwrites, reason="Unlock channel!")
+        await channel_mention.edit(sync_permissions=True)
         if channel_mention.name.endswith('-locked'):
             await channel_mention.edit(name=channel_mention.name.removesuffix('-locked'))
 
