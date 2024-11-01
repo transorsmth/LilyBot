@@ -159,7 +159,7 @@ class Roles(Cog):
             role = member.guild.get_role(missing_role.role_id)
             if role is None:  # Role with that ID does not exist
                 missing.add(missing_role.role_name)
-            elif role.position > top_restorable:
+            elif role.position > top_restorable or role.id == 983824742287024168 or role.id == 983818362985533501:
                 cant_give.add(role.name)
             else:
                 valid.add(role)
