@@ -81,7 +81,7 @@ def is_mashing(text: str, cutoff=1.75):
     return score_not_mashing(text) < cutoff
 
 
-ignorefilter = ['mississippi', 'triggering', 'interesting', "relatable"]
+ignorefilter = ['mississippi', 'triggering', 'interesting', "relatable", "disengage", "skull", "shroomgirl", "phenomenal", "blindness", "uninteractive"]
 
 
 def is_keysmash(text):

@@ -18,14 +18,13 @@ from ._utils import *
 from .general import blurple
 from .. import db
 from ..components.CustomJoinLeaveMessages import send_log
+
 if typing.TYPE_CHECKING:
     from lilybot import LilyBot
 
 __all__ = ["SafeRoleConverter", "Moderation", "NewMemPurgeConfig", "GuildNewMember"]
 
 MAX_PURGE = 1000
-
-
 
 
 class SafeRoleConverter(RoleConverter):
@@ -618,6 +617,35 @@ class Moderation(Cog):
     unmute.example_usage = """
     `{prefix}unmute @user reason - unmute @user for a given (optional) reason
     """
+
+    @command()
+    @has_permissions(manage_messages=True)
+    @bot_has_permissions(manage_channels=True)
+    async def lock(self, ctx: LilyBotContext, channel_mention: discord.TextChannel, *,
+                   reason: str = "No reason provided"):
+        """Lock a channel to @everyone so they can't send messages"""
+        msg = await ctx.reply("Locking.")
+        await channel_mention.send(f"This channel has been locked by {ctx.author.mention}. \n Reason: {reason}")
+        overwrites = channel_mention.overwrites_for(ctx.guild.default_role)
+        overwrites.update(send_messages=False)
+        await channel_mention.edit(name=channel_mention.name+"-locked")
+        await ctx.message.delete(delay=5)
+        await msg.delete(delay=5)
+        await channel_mention.set_permissions(ctx.guild.default_role, overwrite=overwrites, reason=f"Lock channel: {reason}")
+
+    @command()
+    @has_permissions(manage_messages=True)
+    @bot_has_permissions(manage_channels=True)
+    async def unlock(self, ctx: LilyBotContext, channel_mention: discord.TextChannel):
+        """Unlock a channel"""
+
+        if channel_mention.name.endswith('-locked'):
+            await channel_mention.edit(name=channel_mention.name.removesuffix('-locked'))
+
+        msg = await ctx.reply("Unlocked.")
+        await ctx.message.delete(delay=5)
+        await msg.delete(delay=5)
+        await channel_mention.edit(sync_permissions=True)
 
     @command()
     @has_permissions(manage_roles=True)
