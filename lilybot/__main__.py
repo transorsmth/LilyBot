@@ -5,7 +5,6 @@ import os
 import sys
 
 import discord
-import sentry_sdk
 from loguru import logger
 
 config = {
@@ -37,8 +36,7 @@ config = {
     'debug': False,
     'presences_intents': False,
     'is_backup': False,
-    'invite_override': "",
-    "sentry_url": ""
+    'invite_override': ""
 }
 config_file = 'config.json'
 
@@ -48,12 +46,6 @@ if os.path.isfile(config_file):
 
 with open('config.json', 'w') as f:
     json.dump(config, f, indent='\t')
-
-if config['sentry_url'] != "":
-    sentry_sdk.init(  # pylint: disable=abstract-class-instantiated  # noqa: E0110
-        str(config['sentry_url']),
-        traces_sample_rate=1.0,
-    )
 
 if 'discord_token' not in config:
     sys.exit('Discord token must be supplied in configuration')

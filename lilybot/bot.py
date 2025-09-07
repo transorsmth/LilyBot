@@ -9,7 +9,6 @@ from typing import Pattern, Optional, Union, Generator
 import discord
 from discord.ext import commands
 from loguru import logger
-from sentry_sdk import capture_exception
 
 from . import utils
 from .cogs import _utils
@@ -131,9 +130,8 @@ class LilyBot(commands.Bot):
 
     async def on_error(self, event_method, *args, **kwargs):
         """Don't ignore the error, causing Sentry to capture it."""
-        print('Ignoring exception in {}'.format(event_method), file=sys.stderr)
+        logger.error('Ignoring exception in {}'.format(event_method), file=sys.stderr)
         traceback.print_exc()
-        capture_exception()
 
     async def get_context(self, message, *, cls=LilyBotContext) -> LilyBotContext:
         ctx = await super().get_context(message, cls=cls)

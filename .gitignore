@@ -22,3 +22,6 @@ venv/
 settings.json
 /.mypy_cache/
 *.pickle
+
+
+uv.lock
